@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAAG208 & 304 — Genetics for Agriculture | บทเรียนออนไลน์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1F3864;
+    --teal:#0F6B72;
+    --teal-light:#EAF1F1;
+    --bg:#F7F8FA;
+    --card:#FFFFFF;
+    --text:#232830;
+    --muted:#6B7280;
+    --border:#E3E7EC;
+    --ok-bg:#EAF7EC;
+    --ok-text:#1E7A34;
+    --err-bg:#FDECEC;
+    --err-text:#B3261E;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Sarabun','Noto Sans Thai','Segoe UI',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.7;
+  }
+  a{color:var(--teal);}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px 60px;}
+
+  /* Header */
+  header.top{
+    background:linear-gradient(135deg,var(--navy),var(--teal));
+    color:#fff;
+    padding:28px 20px 22px;
+  }
+  header.top .wrap{padding-bottom:0;}
+  .top-title{font-size:1.5rem;font-weight:700;margin:0 0 4px;}
+  .top-sub{font-size:.95rem;opacity:.9;margin:0 0 16px;}
+  .overall-progress{background:rgba(255,255,255,.18);border-radius:999px;height:10px;overflow:hidden;margin-bottom:6px;}
+  .overall-progress-bar{height:100%;background:#fff;border-radius:999px;transition:width .4s ease;}
+  .overall-progress-label{font-size:.8rem;opacity:.9;}
+
+  /* Nav */
+  nav.tabs{
+    display:flex;gap:8px;flex-wrap:wrap;
+    background:var(--card);
+    border-bottom:1px solid var(--border);
+    padding:10px 20px;
+    position:sticky;top:0;z-index:10;
+  }
+  nav.tabs .inner{display:flex;gap:8px;flex-wrap:wrap;max-width:920px;margin:0 auto;width:100%;}
+  .tab-btn{
+    border:1px solid var(--border);background:#fff;color:var(--text);
+    padding:9px 16px;border-radius:999px;font-family:inherit;font-size:.92rem;
+    cursor:pointer;font-weight:600;transition:.15s;white-space:nowrap;
+  }
+  .tab-btn:hover{border-color:var(--teal);}
+  .tab-btn.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+
+  main{padding-top:24px;}
+  .page{display:none;}
+  .page.active{display:block;}
+
+  /* Home */
+  .home-hero{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:20px;}
+  .home-hero h2{margin-top:0;color:var(--navy);}
+  .how-to{background:var(--teal-light);border-radius:10px;padding:14px 18px;margin-top:12px;font-size:.94rem;}
+  .how-to b{color:var(--teal);}
+
+  .module-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+  .module-card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;gap:8px;
+  }
+  .module-card:hover{border-color:var(--teal);box-shadow:0 4px 14px rgba(15,107,114,.12);}
+  .module-badge{
+    width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:.95rem;
+  }
+  .module-card h3{margin:2px 0 0;font-size:1.05rem;color:var(--navy);}
+  .module-card p{margin:0;font-size:.88rem;color:var(--muted);}
+  .card-progress-row{display:flex;align-items:center;gap:8px;margin-top:auto;}
+  .mini-bar{flex:1;height:7px;background:var(--border);border-radius:999px;overflow:hidden;}
+  .mini-bar-fill{height:100%;border-radius:999px;transition:width .3s;}
+  .card-score{font-size:.8rem;font-weight:700;color:var(--muted);white-space:nowrap;}
+
+  /* Module page */
+  .module-header{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:18px;}
+  .module-header h2{margin:0 0 4px;color:var(--navy);}
+  .module-header .meta{font-size:.85rem;color:var(--muted);}
+  .module-progress{margin-top:12px;}
+  .link-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  .link-btn{
+    display:inline-flex;align-items:center;gap:6px;background:var(--teal-light);color:var(--teal);
+    border:1px solid var(--teal);padding:7px 14px;border-radius:999px;text-decoration:none;font-size:.85rem;font-weight:600;
+  }
+  .link-btn:hover{background:var(--teal);color:#fff;}
+
+  .section-block{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px;}
+  .section-block h3{margin:0 0 10px;color:var(--navy);font-size:1.12rem;display:flex;align-items:center;gap:8px;}
+  .section-block h3 .num{
+    background:var(--teal-light);color:var(--teal);border-radius:8px;font-size:.78rem;padding:2px 8px;font-weight:700;
+  }
+  .section-block p{margin:0 0 10px;font-size:.97rem;}
+  .section-block ul{margin:0 0 10px;padding-left:22px;font-size:.95rem;}
+  .section-block li{margin-bottom:4px;}
+
+  .note{
+    background:#FFF7E6;border-left:4px solid #E0A400;border-radius:8px;
+    padding:10px 14px;font-size:.9rem;margin-top:6px;color:#6b5400;
+  }
+  .note b{color:#8a6b00;}
+
+  table.mini{border-collapse:collapse;width:100%;margin:10px 0;font-size:.88rem;}
+  table.mini th,table.mini td{border:1px solid var(--border);padding:6px 10px;text-align:center;}
+  table.mini th{background:var(--navy);color:#fff;}
+  table.mini tr:nth-child(even) td{background:var(--teal-light);}
+
+  /* Quiz */
+  .quiz-block{
+    background:#FBFCFE;border:1.5px dashed var(--teal);border-radius:var(--radius);
+    padding:20px 22px;margin-bottom:16px;
+  }
+  .quiz-block h3{margin:0 0 4px;color:var(--teal);font-size:1.05rem;}
+  .quiz-tag{
+    display:inline-block;background:var(--teal);color:#fff;font-size:.72rem;font-weight:700;
+    padding:2px 9px;border-radius:999px;margin-bottom:8px;letter-spacing:.02em;
+  }
+  .quiz-tag.pretest{background:#B45309;}
+  .quiz-tag.posttest{background:#4338CA;}
+  .prepost-block{border-color:#B0B8C4;}
+  .quiz-q{font-size:.98rem;font-weight:600;margin:6px 0 12px;}
+  .choice{
+    display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid var(--border);
+    border-radius:10px;padding:10px 14px;margin-bottom:8px;cursor:pointer;font-size:.93rem;transition:.12s;
+  }
+  .choice:hover{border-color:var(--teal);}
+  .choice input{margin-top:3px;}
+  .choice.correct{background:var(--ok-bg);border-color:var(--ok-text);}
+  .choice.wrong{background:var(--err-bg);border-color:var(--err-text);}
+  .quiz-actions{display:flex;align-items:center;gap:10px;margin-top:10px;}
+  .btn{
+    background:var(--navy);color:#fff;border:none;padding:9px 18px;border-radius:8px;
+    font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;
+  }
+  .btn:hover{background:var(--teal);}
+  .btn:disabled{background:#B9C0CB;cursor:not-allowed;}
+  .btn.secondary{background:#fff;color:var(--teal);border:1px solid var(--teal);}
+  .btn.secondary:hover{background:var(--teal-light);}
+  .feedback{
+    margin-top:12px;padding:12px 14px;border-radius:10px;font-size:.9rem;display:none;
+  }
+  .feedback.ok{background:var(--ok-bg);color:var(--ok-text);display:block;}
+  .feedback.err{background:var(--err-bg);color:var(--err-text);display:block;}
+  .feedback b{display:block;margin-bottom:3px;}
+
+  .end-summary{
+    background:linear-gradient(135deg,var(--navy),var(--teal));color:#fff;
+    border-radius:var(--radius);padding:22px;text-align:center;margin-top:6px;
+  }
+  .end-summary h3{margin:0 0 6px;}
+  .end-score{font-size:2rem;font-weight:800;margin:8px 0;}
+  .next-btn{
+    display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--navy);
+    border:none;padding:9px 18px;border-radius:999px;text-decoration:none;font-size:.9rem;font-weight:700;
+    cursor:pointer;font-family:inherit;
+  }
+  .next-btn:hover{opacity:.9;}
+
+  /* Check-in */
+  .checkin-block{
+    background:var(--card);border:1.5px solid var(--navy);border-radius:var(--radius);
+    padding:24px 24px 26px;margin-bottom:16px;
+  }
+  .checkin-block h3{margin:0 0 8px;color:var(--navy);font-size:1.1rem;}
+  .checkin-block p{margin:0 0 16px;font-size:.9rem;color:var(--muted);}
+  .checkin-field{margin-bottom:12px;}
+  .checkin-field label{display:block;font-size:.85rem;font-weight:600;margin-bottom:5px;color:var(--text);}
+  .checkin-field input{
+    width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;
+    font-family:inherit;font-size:.95rem;
+  }
+  .checkin-field input:focus{outline:none;border-color:var(--teal);}
+  .checkin-error{color:var(--err-text);font-size:.85rem;margin-top:8px;display:none;}
+  .checkin-error.show{display:block;}
+  .checkin-note{
+    background:var(--teal-light);border-radius:8px;padding:10px 14px;font-size:.82rem;
+    color:#3a5a5c;margin-top:14px;
+  }
+  .checkin-banner{
+    display:flex;align-items:center;gap:10px;background:var(--ok-bg);color:var(--ok-text);
+    border-radius:10px;padding:10px 16px;font-size:.88rem;margin-top:14px;font-weight:600;
+  }
+
+  /* Final gate (module 3) */
+  .gate-box{
+    margin-top:16px;border-radius:12px;padding:16px 18px;font-size:.9rem;
+  }
+  .gate-locked{background:rgba(255,255,255,.12);}
+  .gate-locked ul{list-style:none;padding:0;margin:10px 0 0;text-align:left;display:inline-block;}
+  .gate-locked li{margin-bottom:5px;}
+  .gate-unlocked{background:rgba(255,255,255,.15);}
+
+  /* Checkin blocked / warning states */
+  .ci-block-msg{
+    background:var(--err-bg);color:var(--err-text);border-radius:10px;padding:12px 16px;
+    font-size:.88rem;margin-top:14px;display:none;
+  }
+  .ci-block-msg.show{display:block;}
+  .ci-block-msg .btn{margin-top:8px;}
+  .ci-warn-msg{
+    background:#FFF7E6;color:#8a6b00;border-radius:10px;padding:10px 14px;
+    font-size:.85rem;margin-top:12px;display:none;
+  }
+  .ci-warn-msg.show{display:block;}
+
+  /* Exam page */
+  .exam-hero{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:24px;margin-bottom:18px;
+  }
+  .exam-hero h2{margin:0 0 8px;color:var(--navy);}
+  .exam-gate{
+    background:var(--card);border:1.5px solid var(--navy);border-radius:var(--radius);padding:22px 24px;
+  }
+  .exam-result{margin-top:16px;border-radius:10px;padding:16px 18px;font-size:.92rem;display:none;}
+  .exam-result.show{display:block;}
+  .exam-result.locked{background:var(--err-bg);color:var(--err-text);}
+  .exam-result.unlocked{background:var(--ok-bg);color:var(--ok-text);}
+  .exam-result.err{background:#FFF7E6;color:#8a6b00;}
+  .exam-result ul{list-style:none;padding:0;margin:10px 0 0;}
+  .exam-result li{margin-bottom:4px;}
+  .exam-result .link-btn{margin-top:12px;}
+  .exam-result.neutral{background:var(--teal-light);color:var(--text);}
+
+  /* Learning Analytics / Insights */
+  .risk-badge{
+    display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:10px 16px;
+    font-size:.95rem;font-weight:700;margin-bottom:14px;
+  }
+  .risk-good{background:var(--ok-bg);color:var(--ok-text);}
+  .risk-warning{background:#FFF7E6;color:#8a6b00;}
+  .risk-serious{background:var(--err-bg);color:var(--err-text);}
+  .risk-nodata{background:var(--border);color:var(--muted);}
+  .insights-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:6px;}
+  .insights-stat{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center;}
+  .insights-stat .num{display:block;font-size:1.4rem;font-weight:800;color:var(--navy);}
+  .insights-stat .lbl{display:block;font-size:.78rem;color:var(--muted);margin-top:2px;}
+  .weak-topic-card{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;
+  }
+  .analytics-note{
+    background:var(--teal-light);border-radius:8px;padding:10px 14px;font-size:.82rem;
+    color:#3a5a5c;margin-top:14px;
+  }
+
+  footer{
+    text-align:center;color:var(--muted);font-size:.8rem;padding:26px 20px;
+  }
+  @media (max-width:520px){
+    .top-title{font-size:1.25rem;}
+    nav.tabs{padding:8px 12px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <p class="top-title">🌱 KAAG208 & 304 — Genetics for Agriculture</p>
+    <p class="top-sub">บทเรียนออนไลน์สำหรับทบทวนด้วยตนเอง · ดร.เนติยา การะเกตุ</p>
+    <p class="top-sub" id="dbStatusLine" style="font-size:.8rem;">⏳ กำลังตรวจสอบการเชื่อมต่อฐานข้อมูล...</p>
+    <div class="overall-progress"><div class="overall-progress-bar" id="overallBar" style="width:0%"></div></div>
+    <p class="overall-progress-label" id="overallLabel">ทำแบบฝึกหัดแล้ว 0 / 18 ข้อ</p>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="inner" id="tabBar"></div>
+</nav>
+
+<main class="wrap">
+  <div class="page active" id="page-home"></div>
+  <div class="page" id="page-m1"></div>
+  <div class="page" id="page-m2"></div>
+  <div class="page" id="page-m3"></div>
+  <div class="page" id="page-insights"></div>
+  <div class="page" id="page-exam"></div>
+</main>
+
+<footer>
+  จัดทำจากเอกสารประกอบการสอนรายวิชา KAAG208 & 304: Genetics for Agriculture · ใช้เพื่อการทบทวนด้วยตนเองเท่านั้น
+  คะแนนในแบบฝึกหัด และแบบทดสอบก่อนเรียน/หลังเรียนของแต่ละครั้ง ไม่ใช่คะแนนเก็บของรายวิชา — แบบทดสอบเก็บคะแนนจริงอยู่ที่แท็บ "แบบทดสอบจริง" จะปลดล็อกให้ทำหลังเรียนและทำแบบฝึกหัดครบทั้งครั้งที่ 1–3 และเปิดให้ทำเฉพาะวันที่ 26 กันยายน 2569 เวลา 10:30–12:30 น. เท่านั้น<br>
+  การเช็คชื่อเข้าเรียนจะถูกบันทึกลงฐานข้อมูลกลาง (Google Sheet ของอาจารย์) พร้อมรหัสนักศึกษา อีเมล และวันเวลา เพื่อใช้ตรวจสอบความคืบหน้าข้ามอุปกรณ์และปลดล็อกแบบทดสอบจริง
+</footer>
+
+<script>
+/* ================= DATA ================= */
+const MODULES = [
+  {
+    id:"m1", color:"#2563EB", badge:"1",
+    title:"Genetic Inheritance", subtitle:"พันธุศาสตร์เมนเดล — ครั้งที่ 1",
+    icon:"🧬",
+    cardDesc:"หลักการถ่ายทอดลักษณะทางพันธุกรรม, Punnett Square, หมู่เลือด ABO, พันธุกรรมเชื่อมโยงเพศ",
+    video:"https://youtu.be/Yvaho4IhdbM",
+    form:"https://forms.gle/7wYnFG1kVxeLhK3r5",
+    prepost:[
+      {q:"ข้อใดคือ \"องค์ประกอบทางพันธุกรรม\" ของสิ่งมีชีวิต ที่เขียนแทนด้วยสัญลักษณ์ตัวอักษร เช่น Tt หรือ tt?",
+        choices:["Phenotype","Genotype","Allele","Chromosome"],
+        correct:1, explain:"Genotype คือองค์ประกอบทางพันธุกรรมที่เขียนแทนด้วยสัญลักษณ์ตัวอักษร ส่วน Phenotype คือลักษณะที่แสดงออกจริงทางกายภาพ"},
+      {q:"ผสมพันธุ์ต้นถั่ว Tt (ต้นสูง) x Tt (ต้นสูง) ลูกที่ได้จะมีลักษณะ \"ต้นสูง\" (ลักษณะเด่น) คิดเป็นกี่เปอร์เซ็นต์?",
+        choices:["25%","50%","75%","100%"],
+        correct:2, explain:"Tt x Tt ให้อัตราส่วนจีโนไทป์ 1 TT : 2 Tt : 1 tt ซึ่ง TT และ Tt ต่างแสดงลักษณะเด่น (ต้นสูง) เหมือนกัน จึงรวมเป็น 3 ใน 4 หรือ 75%"},
+      {q:"ลักษณะทางพันธุกรรมที่ถูกควบคุมด้วยยีนบนโครโมโซม X และมักพบในเพศชายมากกว่าเพศหญิง เช่น ภาวะตาบอดสี เรียกว่าลักษณะแบบใด?",
+        choices:["Sex-linked trait (ลักษณะเชื่อมโยงเพศ)","Autosomal trait","Co-dominant trait","Incomplete dominant trait"],
+        correct:0, explain:"ลักษณะที่ควบคุมด้วยยีนบนโครโมโซมเพศ (X หรือ Y) เรียกว่า Sex-linked trait ซึ่งเพศชาย (XY) มักแสดงลักษณะด้อยบน X ออกมาได้ง่ายกว่าเพศหญิง (XX)"}
+    ],
+    sections:[
+      {type:"text", heading:"1) พันธุศาสตร์คืออะไร", body:[
+        "พันธุศาสตร์ (Genetics) คือการศึกษาว่ายีนถูกถ่ายทอดจากรุ่นพ่อแม่ไปสู่รุ่นลูกอย่างไร โดย เกรเกอร์ เมนเดล (Gregor Mendel) พระชาวออสเตรีย ได้รับการยกย่องเป็น \"บิดาแห่งพันธุศาสตร์\" จากการทดลองผสมพันธุ์ต้นถั่วลันเตา",
+        "เมนเดลเลือกใช้ถั่วลันเตาเพราะแสดงลักษณะที่แตกต่างกันชัดเจน ผสมพันธุ์และเก็บผลได้เร็ว และมีหลายสายพันธุ์ให้เลือกศึกษา"
+      ]},
+      {type:"text", heading:"2) คำศัพท์พื้นฐานที่ต้องรู้ก่อน", body:[
+        "ก่อนเข้าสู่การคำนวณ ต้องเข้าใจศัพท์เหล่านี้ให้แม่นก่อน:"
+      ], bullets:[
+        "<b>Gene (ยีน)</b> — ส่วนของ DNA ที่กำหนดลักษณะหนึ่ง ๆ เช่น ยีนควบคุมสีตา",
+        "<b>Allele (แอลลีล)</b> — รูปแบบต่าง ๆ ของยีนเดียวกัน เช่น แอลลีลตาสีฟ้า กับ แอลลีลตาสีน้ำตาล",
+        "<b>Genotype (จีโนไทป์)</b> — องค์ประกอบทางพันธุกรรม เขียนแทนด้วยตัวอักษร เช่น Tt",
+        "<b>Phenotype (ฟีโนไทป์)</b> — ลักษณะที่แสดงออกจริงทางกายภาพ เช่น ต้นสูง",
+        "<b>Locus (โลคัส)</b> — ตำแหน่งของยีนบนโครโมโซม",
+        "<b>Homozygous (โฮโมไซกัส)</b> — แอลลีลคู่เหมือนกัน เช่น TT หรือ tt",
+        "<b>Heterozygous (เฮเทอโรไซกัส)</b> — แอลลีลคู่ต่างกัน เช่น Tt"
+      ], note:"💡 <b>เทคนิคจำง่าย:</b> ให้นึกว่า Gene คือ \"ตำแหน่งงาน\" ส่วน Allele คือ \"ผู้สมัครแต่ละคน\" ที่มาแข่งกันในตำแหน่งนั้น — Genotype คือรายชื่อผู้ได้รับเลือกทั้งคู่ ส่วน Phenotype คือสิ่งที่ทุกคนมองเห็นเป็นผลลัพธ์"},
+      {type:"quiz", id:"m1e1", tag:"แบบฝึกหัดที่ 1", topic:"คำศัพท์พื้นฐานที่ต้องรู้ก่อน", q:"สิ่งมีชีวิตที่มีจีโนไทป์ \"Aa\" เรียกว่าลักษณะใด?",
+        choices:["Homozygous dominant (AA)","Homozygous recessive (aa)","Heterozygous (แอลลีลต่างกัน)","Phenotype เด่น"],
+        correct:2, explain:"Aa มีแอลลีลสองตัวที่ต่างกัน (A กับ a) จึงเรียกว่า Heterozygous ส่วน Homozygous ต้องเป็นแอลลีลคู่เหมือนกันเท่านั้น เช่น AA หรือ aa"},
+      {type:"text", heading:"3) กฎการแยกตัว (Law of Segregation) และ Punnett Square", body:[
+        "กฎข้อที่ 1 ของเมนเดล กล่าวว่า แอลลีลที่เป็นคู่กันจะแยกออกจากกันตอนสร้างเซลล์สืบพันธุ์ (gamete) ทำให้เซลล์สืบพันธุ์แต่ละเซลล์มีแอลลีลเพียงตัวเดียวจากคู่นั้น",
+        "Punnett Square เป็นตารางช่วยทำนายสัดส่วนลูกที่จะเกิดขึ้นจากการผสมพันธุ์ ตัวอย่างการผสม Tt × Tt (ต้นสูงลักษณะเด่น T ผสมกับต้นสูงลักษณะเด่นเช่นกัน แต่เป็น heterozygous ทั้งคู่):"
+      ], table:{head:["","T","t"],rows:[["T","TT","Tt"],["t","Tt","tt"]]},
+      note:"ผลลัพธ์: จีโนไทป์ 1 TT : 2 Tt : 1 tt แต่ฟีโนไทป์จะออกมาเป็น <b>สูง : เตี้ย = 3 : 1</b> เพราะ TT และ Tt ต่างก็แสดงลักษณะเด่น (สูง) เหมือนกัน"},
+      {type:"quiz", id:"m1e2", tag:"แบบฝึกหัดที่ 2", topic:"กฎการแยกตัว (Law of Segregation) และ Punnett Square", q:"ผสมถั่วเมล็ดกลม (Rr) กับถั่วเมล็ดกลม (Rr) เข้าด้วยกัน ลูกที่ได้จะมีลักษณะ \"เมล็ดขรุขระ\" (rr) กี่เปอร์เซ็นต์?",
+        choices:["0%","25%","50%","75%"],
+        correct:1, explain:"Rr × Rr ให้อัตราส่วนจีโนไทป์ 1 RR : 2 Rr : 1 rr ดังนั้นโอกาสได้ rr (เมล็ดขรุขระ ลักษณะด้อย) คือ 1 ใน 4 หรือ 25%"},
+      {type:"text", heading:"4) กฎการรวมกลุ่มอย่างอิสระ (Law of Independent Assortment)", body:[
+        "กฎข้อที่ 2 ใช้เมื่อพิจารณา 2 ลักษณะพร้อมกัน (dihybrid cross) โดยระบุว่าแอลลีลของแต่ละคู่ลักษณะจะแยกตัวไปยังเซลล์สืบพันธุ์อย่างอิสระจากกัน ไม่ขึ้นกับลักษณะอื่น",
+        "เมื่อผสมพันธุ์ที่เป็น heterozygous ทั้งสองลักษณะเข้าด้วยกัน (เช่น RrYy × RrYy) รุ่นลูก F2 จะได้อัตราส่วนฟีโนไทป์แบบ <b>9 : 3 : 3 : 1</b>"
+      ]},
+      {type:"quiz", id:"m1e3", tag:"แบบฝึกหัดที่ 3", topic:"กฎการรวมกลุ่มอย่างอิสระ (Law of Independent Assortment)", q:"ในการผสม dihybrid cross แบบ RrYy × RrYy สัดส่วนของลูกที่แสดงลักษณะเด่นทั้งสองลักษณะพร้อมกัน (เช่น เมล็ดกลม-สีเหลือง) คือเท่าไร?",
+        choices:["1/16","3/16","9/16","1/4"],
+        correct:2, explain:"จากอัตราส่วน 9:3:3:1 ของ dihybrid cross ลักษณะเด่นทั้งคู่พร้อมกันคิดเป็นสัดส่วน 9/16 ของลูกทั้งหมด"},
+      {type:"text", heading:"5) รูปแบบการข่มของยีน (Dominance)", body:[
+        "ไม่ใช่ทุกคู่แอลลีลจะข่มกันแบบเด่น-ด้อยสมบูรณ์เสมอไป มี 3 รูปแบบหลัก:"
+      ], bullets:[
+        "<b>Complete dominance (ข่มสมบูรณ์)</b> — heterozygote แสดงลักษณะเหมือน homozygous dominant ทุกประการ",
+        "<b>Incomplete dominance (ข่มไม่สมบูรณ์)</b> — heterozygote แสดงลักษณะ \"กึ่งกลาง\" ระหว่างพ่อแม่ เช่น ดอกไม้สีแดงผสมสีขาว ได้ลูกดอกสีชมพู",
+        "<b>Co-dominance (ข่มร่วมกัน)</b> — แอลลีลทั้งสองแสดงออกพร้อมกันโดยไม่ผสมกัน เช่น หมู่เลือด AB ที่แสดงทั้งแอนติเจน A และ B"
+      ]},
+      {type:"quiz", id:"m1e4", tag:"แบบฝึกหัดที่ 4", topic:"รูปแบบการข่มของยีน (Dominance)", q:"ผสมดอกไม้สีแดง (RR) กับดอกไม้สีขาว (WW) แล้วได้ลูก F1 เป็นดอกสีชมพูล้วน ปรากฏการณ์นี้เรียกว่าอะไร?",
+        choices:["Complete dominance","Incomplete dominance","Co-dominance","Multiple alleles"],
+        correct:1, explain:"เมื่อ heterozygote (RW) แสดงลักษณะกึ่งกลางระหว่างพ่อแม่ทั้งสอง (สีชมพู อยู่ระหว่างแดงกับขาว) นี่คือลักษณะของ Incomplete dominance"},
+      {type:"text", heading:"6) Multiple alleles: หมู่เลือดระบบ ABO", body:[
+        "บางลักษณะถูกควบคุมด้วยแอลลีลมากกว่า 2 แบบในประชากร แม้แต่ละคนจะมีได้เพียง 2 แอลลีลเท่านั้น ตัวอย่างคลาสสิกคือหมู่เลือดคนที่มี 3 แอลลีล คือ I<sup>A</sup>, I<sup>B</sup> (co-dominant กัน) และ i (ด้อย)"
+      ], table:{head:["จีโนไทป์","หมู่เลือด"],rows:[["I<sup>A</sup>I<sup>A</sup> หรือ I<sup>A</sup>i","A"],["I<sup>B</sup>I<sup>B</sup> หรือ I<sup>B</sup>i","B"],["I<sup>A</sup>I<sup>B</sup>","AB"],["ii","O"]]}},
+      {type:"quiz", id:"m1e5", tag:"แบบฝึกหัดที่ 5", topic:"Multiple alleles: หมู่เลือดระบบ ABO", q:"พ่อมีจีโนไทป์ I<sup>A</sup>i (หมู่เลือด A) แม่มีจีโนไทป์ I<sup>B</sup>i (หมู่เลือด B) ลูกที่เกิดมา \"ไม่มีทางเป็น\" หมู่เลือดใด?",
+        choices:["หมู่เลือด A","หมู่เลือด AB","หมู่เลือด O","ไม่มีข้อถูก — ลูกเป็นได้ทุกหมู่"],
+        correct:3, explain:"I<sup>A</sup>i × I<sup>B</sup>i ให้จีโนไทป์ที่เป็นไปได้ทั้งหมด: I<sup>A</sup>I<sup>B</sup> (AB), I<sup>A</sup>i (A), I<sup>B</sup>i (B), ii (O) — ลูกจึงมีโอกาสเป็นได้ทั้ง 4 หมู่เลือด"},
+      {type:"text", heading:"7) การกำหนดเพศและลักษณะเชื่อมโยงเพศ (Sex-linked traits)", body:[
+        "มนุษย์มีโครโมโซม 23 คู่ โดย 22 คู่แรกเรียกว่าออโตโซม (autosome) ส่วนคู่ที่ 23 เป็นโครโมโซมเพศ — เพศหญิงเป็น XX ส่วนเพศชายเป็น XY",
+        "ยีนบนโครโมโซม X บางยีนไม่มีคู่บนโครโมโซม Y เมื่อเพศชายได้รับแอลลีลด้อยบน X เพียงตัวเดียว ก็จะแสดงลักษณะนั้นออกมาทันที (เพราะไม่มี X อีกตัวมาข่ม) เช่น ภาวะตาบอดสี (colorblindness)"
+      ]},
+      {type:"quiz", id:"m1e6", tag:"แบบฝึกหัดที่ 6", topic:"การกำหนดเพศและลักษณะเชื่อมโยงเพศ (Sex-linked traits)", q:"แม่เป็นพาหะของภาวะตาบอดสี (X<sup>C</sup>X<sup>c</sup>) แต่งงานกับพ่อที่มองเห็นสีปกติ (X<sup>C</sup>Y) ลูกชายมีโอกาสเป็นตาบอดสีกี่เปอร์เซ็นต์?",
+        choices:["0%","25%","50%","100%"],
+        correct:2, explain:"ลูกชายรับ Y จากพ่อ และรับ X หนึ่งตัวจากแม่ (X<sup>C</sup> หรือ X<sup>c</sup> โอกาสละ 50%) หากได้รับ X<sup>c</sup> จะแสดงอาการตาบอดสีทันทีเพราะมี X เพียงตัวเดียว จึงมีโอกาส 50%"}
+    ]
+  },
+  {
+    id:"m2", color:"#0F6B72", badge:"2",
+    title:"Cytogenetics", subtitle:"ไซโตเจเนติกส์ — ครั้งที่ 2",
+    icon:"🧫",
+    cardDesc:"โครงสร้างโครโมโซม, การเปลี่ยนแปลงโครงสร้าง, พลอยดีและพืชโพลีพลอยด์",
+    video:"https://youtu.be/oUSvhEp5nbo",
+    form:"https://forms.gle/7wYnFG1kVxeLhK3r5",
+    prepost:[
+      {q:"โครงสร้างส่วนใดของโครโมโซมทำหน้าที่ปกป้องปลายโครโมโซมไม่ให้เสื่อมสภาพ?",
+        choices:["Centromere","Kinetochore","Telomere","Chromatid"],
+        correct:2, explain:"Telomere คือบริเวณปลายสุดทั้งสองข้างของโครโมโซม ทำหน้าที่ปกป้องปลายโครโมโซมไม่ให้เสื่อมสภาพ"},
+      {q:"ภาวะที่สิ่งมีชีวิตมีจำนวนโครโมโซมบางแท่งเกินหรือขาดไปจากชุดปกติ (ไม่สมดุล) เรียกว่าอะไร?",
+        choices:["Euploid","Aneuploid","Polyploid","Haploid"],
+        correct:1, explain:"Aneuploid คือภาวะที่มีจำนวนโครโมโซมบางแท่งเกินหรือขาดไปจากชุดปกติ เช่น Trisomy หรือ Monosomy ต่างจาก Euploid ที่มีจำนวนโครโมโซมสมดุลปกติ"},
+      {q:"พืชที่มีชุดโครโมโซมมากกว่า 2 ชุด โดยได้รับชุดโครโมโซมมาจากพืชต่างสปีชีส์กัน (เช่น ข้าวสาลี) จัดเป็นพลอยดีชนิดใด?",
+        choices:["Autopolyploidy","Allopolyploidy","Monoploidy","Aneuploidy"],
+        correct:1, explain:"Allopolyploidy คือภาวะพลอยดีที่ชุดโครโมโซมมาจากการผสมข้ามสปีชีส์ที่ใกล้ชิดกัน ต่างจาก Autopolyploidy ที่ชุดโครโมโซมทั้งหมดมาจากสปีชีส์เดียวกัน"}
+    ],
+    sections:[
+      {type:"text", heading:"1) โครโมโซมและโครมาทินคืออะไร", body:[
+        "ไซโตเจเนติกส์ (Cytogenetics) คือแขนงของพันธุศาสตร์ที่ศึกษาโครงสร้าง ตำแหน่ง และหน้าที่ของโครโมโซมในเซลล์",
+        "โครโมโซมคือ chromatin (สาย DNA พันรอบโปรตีน) ที่ถูกบรรจุและจัดเรียงอย่างเป็นระเบียบ ประกอบด้วย DNA โปรตีน และ RNA รวมถึงยีนและส่วนที่ไม่แสดงออก (non-coding DNA) จำนวนมาก"
+      ]},
+      {type:"text", heading:"2) โครงสร้างโครโมโซม", body:[
+        "โครโมโซมที่จำลองตัวแล้ว (replicated) ประกอบด้วยส่วนสำคัญ 4 ส่วน:"
+      ], bullets:[
+        "<b>Chromatid (โครมาทิด)</b> — สาย DNA เกลียวคู่ 1 เส้นของโครโมโซมที่จำลองตัวแล้ว",
+        "<b>Centromere (เซนโทรเมียร์)</b> — บริเวณที่โครมาทิดพี่น้องยึดติดกัน เป็นจุดสุดท้ายที่แยกออกจากกันตอนแบ่งเซลล์",
+        "<b>Kinetochore (ไคนีโทคอร์)</b> — โครงสร้างโปรตีนที่หุ้ม centromere ทำหน้าที่ยึดเส้นใยสปินเดิลเพื่อดึงโครโมโซม",
+        "<b>Telomere (เทโลเมียร์)</b> — บริเวณปลายสุดทั้งสองข้างของโครโมโซม ทำหน้าที่ปกป้องปลายโครโมโซมไม่ให้เสื่อมสภาพ"
+      ], note:"💡 <b>เทคนิคจำง่าย:</b> ลองนึกภาพโครโมโซมเป็น \"เชือกผูกโบว์\" — centromere คือปมตรงกลางที่หนีบไว้ กับ telomere คือปลายเชือกสองข้างที่พันเทปกันลุ่ย (ป้องกันไม่ให้หลุดลุ่ย)"},
+      {type:"quiz", id:"m2e1", tag:"แบบฝึกหัดที่ 1", topic:"โครงสร้างโครโมโซม", q:"โครงสร้างใดของโครโมโซมทำหน้าที่เป็นจุดยึดเกาะของเส้นใยสปินเดิล (spindle fiber) ในการแบ่งเซลล์?",
+        choices:["Telomere","Centromere/Kinetochore","Chromatid","Chromatin"],
+        correct:1, explain:"Kinetochore เป็นโครงสร้างโปรตีนที่อยู่บริเวณ centromere ทำหน้าที่ยึดเส้นใยสปินเดิลเพื่อดึงโครมาทิดแยกออกจากกันระหว่างการแบ่งเซลล์"},
+      {type:"text", heading:"3) รูปร่างโครโมโซมตามตำแหน่ง centromere", body:[
+        "ตำแหน่งของ centromere บนแขนโครโมโซม เป็นตัวกำหนดการจัดจำแนกรูปร่างโครโมโซมออกเป็น 4 แบบ:"
+      ], bullets:[
+        "<b>Metacentric</b> — centromere อยู่กึ่งกลางพอดี แขนสองข้างยาวเท่ากัน",
+        "<b>Submetacentric</b> — centromere ค่อนไปทางปลายข้างหนึ่งเล็กน้อย แขนสองข้างยาวไม่เท่ากัน",
+        "<b>Acrocentric</b> — centromere อยู่ใกล้ปลายข้างหนึ่งมาก แขนข้างหนึ่งสั้นมาก",
+        "<b>Telocentric</b> — centromere อยู่ที่ปลายสุดของโครโมโซมพอดี มีแขนข้างเดียว"
+      ]},
+      {type:"quiz", id:"m2e2", tag:"แบบฝึกหัดที่ 2", topic:"รูปร่างโครโมโซมตามตำแหน่ง centromere", q:"หากพบว่าโครโมโซมหนึ่งมี centromere อยู่ที่ปลายสุดพอดี ทำให้มีแขนยื่นออกมาเพียงข้างเดียว ควรจัดเป็นโครโมโซมชนิดใด?",
+        choices:["Metacentric","Submetacentric","Acrocentric","Telocentric"],
+        correct:3, explain:"Telocentric คือโครโมโซมที่ centromere อยู่ตรงปลายสุดพอดี ทำให้เหลือแขนเพียงข้างเดียวให้เห็น"},
+      {type:"text", heading:"4) การเปลี่ยนแปลงโครงสร้างโครโมโซม", body:[
+        "เมื่อโครโมโซมเกิดการแตกหักและเชื่อมต่อผิดตำแหน่ง จะเกิดการเปลี่ยนแปลงโครงสร้างได้ 4 แบบหลัก:"
+      ], bullets:[
+        "<b>Deletion (การขาดหาย)</b> — ท่อนโครโมโซมหลุดหายไป ทำให้ยีนบางส่วนขาดหายตามไปด้วย",
+        "<b>Duplication (การซ้ำ)</b> — ท่อนโครโมโซมถูกคัดลอกซ้ำ ทำให้มียีนบางส่วนซ้ำกันมากกว่าปกติ",
+        "<b>Inversion (การกลับด้าน)</b> — ท่อนโครโมโซมแตกออกแล้วต่อกลับด้าน (หัวกลับหาง) ก่อนเชื่อมกลับเข้าที่เดิม",
+        "<b>Translocation (การย้ายที่)</b> — ท่อนโครโมโซมหลุดไปเชื่อมกับโครโมโซมอีกแท่งหนึ่งที่ไม่ใช่คู่ homolog กัน"
+      ]},
+      {type:"quiz", id:"m2e3", tag:"แบบฝึกหัดที่ 3", topic:"การเปลี่ยนแปลงโครงสร้างโครโมโซม", q:"หากพบว่าท่อนหนึ่งของโครโมโซม A หลุดไปต่อรวมกับโครโมโซม B ซึ่งเป็นคนละแท่งกัน (ไม่ใช่คู่ homolog) เหตุการณ์นี้เรียกว่าอะไร?",
+        choices:["Deletion","Duplication","Inversion","Translocation"],
+        correct:3, explain:"การที่ท่อนโครโมโซมย้ายไปอยู่บนโครโมโซมแท่งอื่นที่ไม่ใช่คู่ homolog กัน คือลักษณะของ Translocation"},
+      {type:"text", heading:"5) จำนวนโครโมโซมและพลอยดี (Ploidy)", body:[
+        "สิ่งมีชีวิตปกติต้องมีจำนวนโครโมโซมที่สมดุล เรียกว่า <b>euploid</b> หากมีจำนวนโครโมโซมบางแท่งเกินหรือขาดไปจากชุดปกติ (ไม่สมดุล) เรียกว่า <b>aneuploid</b>",
+        "<b>Trisomy</b> คือมีโครโมโซมแท่งใดแท่งหนึ่งเกินมา 1 แท่ง (3 แท่งแทนที่จะเป็นคู่) ส่วน <b>Monosomy</b> คือขาดไป 1 แท่ง ตัวอย่างที่รู้จักกันดีคือกลุ่มอาการดาวน์ (Down syndrome) ซึ่งเกิดจาก trisomy ที่โครโมโซมคู่ 21"
+      ]},
+      {type:"quiz", id:"m2e4", tag:"แบบฝึกหัดที่ 4", topic:"จำนวนโครโมโซมและพลอยดี (Ploidy)", q:"กลุ่มอาการดาวน์ (Down syndrome) ในมนุษย์เกิดจากภาวะใด?",
+        choices:["Monosomy ที่โครโมโซมคู่ 21","Trisomy ที่โครโมโซมคู่ 21","Triploidy ทั้งจีโนม","Deletion ที่โครโมโซม Y"],
+        correct:1, explain:"Down syndrome เกิดจาก trisomy-21 คือมีโครโมโซมคู่ที่ 21 เกินมา 1 แท่ง (รวมเป็น 3 แท่ง) ทำให้เกิดความไม่สมดุลของยีนในบริเวณนั้น"},
+      {type:"text", heading:"6) Autopolyploidy vs Allopolyploidy", body:[
+        "พืชหลายชนิดมีมากกว่า 2 ชุดโครโมโซม (polyploid) ซึ่งแบ่งได้ 2 แบบตามที่มาของชุดโครโมโซม:"
+      ], bullets:[
+        "<b>Autopolyploidy</b> — ชุดโครโมโซมทั้งหมดมาจากสปีชีส์เดียวกัน มักเกิดจากความผิดพลาดของไมโอซิส หรือถูกเหนี่ยวนำด้วยสาร colchicine เช่น มันฝรั่ง (tetraploid)",
+        "<b>Allopolyploidy</b> — ชุดโครโมโซมมาจากการผสมข้ามสปีชีส์ที่ใกล้ชิดกัน เช่น ข้าวสาลี (hexaploid จาก 3 สปีชีส์หญ้า) และฝ้าย"
+      ], table:{head:["พืช","ชนิดพลอยดี","จำนวนโครโมโซม (2n)"],rows:[["มันฝรั่ง (potato)","Autopolyploid","48"],["กล้วย (banana)","Autopolyploid","22, 33"],["ข้าวสาลี (wheat)","Allopolyploid","42"],["ยาสูบ (tobacco)","Allopolyploid","48"]]}},
+      {type:"quiz", id:"m2e5", tag:"แบบฝึกหัดที่ 5", topic:"Autopolyploidy vs Allopolyploidy", q:"ข้าวสาลี (wheat) เป็น hexaploid ที่มีจีโนมมาจากพืชตระกูลหญ้าถึง 3 สปีชีส์ต่างกัน ควรจัดเป็นพลอยดีชนิดใด?",
+        choices:["Autopolyploidy","Allopolyploidy","Aneuploidy","Monoploidy"],
+        correct:1, explain:"เพราะชุดโครโมโซมมาจากพืชต่างสปีชีส์กันถึง 3 ชนิด ผสมข้ามกัน จึงเป็น Allopolyploidy — ต่างจาก Autopolyploidy ที่ชุดโครโมโซมทั้งหมดมาจากสปีชีส์เดียว"},
+      {type:"text", heading:"7) ทำไมแตงโมไร้เมล็ด (Triploid) จึงเป็นหมัน", body:[
+        "แตงโมไร้เมล็ดมีโครโมโซม 3 ชุด (triploid) ซึ่งเป็นภาวะ aneuploid ชนิดหนึ่ง ในขั้นตอน metaphase I ของไมโอซิส โครโมโซม homolog ทั้ง 3 แท่งของแต่ละชุดไม่สามารถจับคู่และแยกตัวออกไปยังขั้วเซลล์ได้อย่างเท่ากัน",
+        "ผลคือเซลล์สืบพันธุ์ที่ได้มีจำนวนโครโมโซมไม่สมดุล (บางชุดเกิน บางชุดขาด) ทำให้ไม่สามารถปฏิสนธิและพัฒนาเป็นเมล็ดได้ตามปกติ — จึงได้ผลแตงโมที่ไม่มีเมล็ด"
+      ]},
+      {type:"quiz", id:"m2e6", tag:"แบบฝึกหัดที่ 6", topic:"ทำไมแตงโมไร้เมล็ด (Triploid) จึงเป็นหมัน", q:"เหตุผลหลักที่ทำให้พืช triploid (เช่น แตงโมไร้เมล็ด) เป็นหมันคืออะไร?",
+        choices:[
+          "เพราะพืช triploid ไม่มีดอกตัวเมีย",
+          "เพราะโครโมโซม 3 ชุดจับคู่และแยกตัวในไมโอซิสได้ไม่สมดุล ทำให้เซลล์สืบพันธุ์ผิดปกติ",
+          "เพราะพืช triploid ไม่สามารถสังเคราะห์แสงได้",
+          "เพราะพืช triploid มีโครโมโซมน้อยเกินไป"
+        ],
+        correct:1, explain:"การมีโครโมโซม homolog 3 ชุดทำให้จับคู่กันในไมโอซิส I ไม่ลงตัว โครโมโซมจึงแยกไปยังขั้วเซลล์ไม่เท่ากัน ได้เซลล์สืบพันธุ์ที่มีจำนวนโครโมโซมไม่สมดุลและเป็นหมันในที่สุด"}
+    ]
+  },
+  {
+    id:"m3", color:"#7C3AED", badge:"3",
+    title:"Mutation, DNA Repair and Recombination", subtitle:"มิวเทชัน การซ่อมแซม และการรีคอมบิเนชันของ DNA — ครั้งที่ 3",
+    icon:"🧪",
+    cardDesc:"ชนิดของมิวเทชัน สารก่อกลายพันธุ์ กลไกซ่อมแซม DNA และการรีคอมบิเนชัน (คะแนนสัดส่วนสูงสุด 10 คะแนน)",
+    video:"https://youtu.be/6rp9xgy9vzA",
+    form:"https://forms.gle/7wYnFG1kVxeLhK3r5",
+    prepost:[
+      {q:"สารเคมีหรือรังสีที่ทำให้อัตราการเกิดมิวเทชันเพิ่มสูงขึ้น เรียกว่าอะไร?",
+        choices:["Mutant","Mutagen","Genotype","Phenotype"],
+        correct:1, explain:"Mutagen คือปัจจัยทางกายภาพหรือเคมีที่ทำให้เกิดหรือเพิ่มอัตราการเกิดมิวเทชัน"},
+      {q:"คู่เบสที่จับคู่ผิดพลาด (mismatch) ซึ่งหลุดรอดจากการตรวจสอบระหว่างการจำลอง DNA จะถูกแก้ไขด้วยกลไกใด?",
+        choices:["Photoreactivation repair","Nucleotide excision repair","Mismatch repair","Base excision repair"],
+        correct:2, explain:"Mismatch repair เป็นกลไกเฉพาะที่ตรวจจับและแก้ไขคู่เบสที่จับคู่ผิดพลาดหลังการจำลอง DNA"},
+      {q:"การไขว้แลกเปลี่ยนสายระหว่างโครโมโซมคู่ homolog ในไมโอซิส ซึ่งผ่านสถานะกลางแบบ \"Holliday junction\" จัดเป็นการรีคอมบิเนชันชนิดใด?",
+        choices:["Site-specific recombination","General recombination","Base excision repair","Transposition"],
+        correct:1, explain:"การแลกเปลี่ยนระหว่างโครโมโซม homolog ที่ผ่าน Holliday junction เป็นสถานะกลาง คือลักษณะเฉพาะของ General recombination"}
+    ],
+    sections:[
+      {type:"text", heading:"1) มิวเทชันคืออะไร", body:[
+        "Mutation (มิวเทชัน) คือการเปลี่ยนแปลงลำดับ DNA ภายในยีนหรือโครโมโซม ทำให้เกิดลักษณะใหม่ (mutant) ที่ไม่พบในสายพันธุ์ดั้งเดิม (wild type)"
+      ], bullets:[
+        "<b>Mutant</b> — สิ่งมีชีวิตที่แสดงฟีโนไทป์ใหม่จากมิวเทชัน",
+        "<b>Mutagen</b> — ปัจจัยทางกายภาพหรือเคมีที่ทำให้เกิดหรือเพิ่มอัตราการเกิดมิวเทชัน",
+        "<b>Mutagenesis</b> — กระบวนการที่ทำให้ข้อมูลพันธุกรรมเปลี่ยนแปลงไปอย่างถาวรจนเกิดมิวเทชัน"
+      ], note:"💡 <b>เทคนิคจำง่าย:</b> มิวเทชัน เปรียบเหมือน \"การพิมพ์ผิด\" ในหนังสือสูตรอาหาร (DNA) — บางครั้งพิมพ์ผิดเองโดยบังเอิญ (spontaneous) บางครั้งมีคนมาแก้ไขให้ผิดโดยตั้งใจ (induced by mutagen)"},
+      {type:"quiz", id:"m3e1", tag:"แบบฝึกหัดที่ 1", topic:"มิวเทชันคืออะไร", q:"สารเคมีหรือรังสีที่ทำให้อัตราการเกิดมิวเทชันเพิ่มสูงขึ้น เรียกว่าอะไร?",
+        choices:["Mutant","Mutagen","Mutagenesis","Genotype"],
+        correct:1, explain:"Mutagen คือปัจจัยทางกายภาพหรือเคมีที่ทำให้เกิดมิวเทชันหรือเพิ่มความถี่ในการเกิดมิวเทชัน ส่วน Mutant คือสิ่งมีชีวิตที่ได้รับผลจากมิวเทชันนั้น"},
+      {type:"text", heading:"2) ชนิดของมิวเทชัน", body:[
+        "มิวเทชันแบ่งตามขนาดการเปลี่ยนแปลงได้หลายระดับ:"
+      ], bullets:[
+        "<b>Point mutation</b> — เปลี่ยนแปลงที่นิวคลีโอไทด์ตำแหน่งเดียว แบ่งเป็น <i>Transition</i> (พิวรีน↔พิวรีน หรือ ไพริมิดีน↔ไพริมิดีน) และ <i>Transversion</i> (พิวรีน↔ไพริมิดีน)",
+        "<b>Insertion</b> — มีนิวคลีโอไทด์เพิ่มเข้ามาในลำดับ DNA",
+        "<b>Deletion</b> — มีนิวคลีโอไทด์หายไปจากลำดับ DNA",
+        "<b>การเปลี่ยนแปลงระดับโครโมโซม</b> — เปลี่ยนแปลงจำนวนหรือโครงสร้างโครโมโซม (เชื่อมโยงกับเนื้อหา Cytogenetics ครั้งที่ 2)"
+      ]},
+      {type:"quiz", id:"m3e2", tag:"แบบฝึกหัดที่ 2", topic:"ชนิดของมิวเทชัน", q:"หากเบส Adenine (พิวรีน) ถูกแทนที่ด้วยเบส Guanine (พิวรีนเช่นกัน) ในตำแหน่งเดียวกัน ควรจัดเป็นมิวเทชันชนิดใด?",
+        choices:["Transversion","Transition","Insertion","Deletion"],
+        correct:1, explain:"การแทนที่ระหว่างเบสกลุ่มเดียวกัน (พิวรีน↔พิวรีน หรือ ไพริมิดีน↔ไพริมิดีน) เรียกว่า Transition ส่วน Transversion คือการแทนที่ข้ามกลุ่ม (พิวรีน↔ไพริมิดีน)"},
+      {type:"text", heading:"3) สารก่อกลายพันธุ์ (Mutagens)", body:[
+        "สารก่อกลายพันธุ์แบ่งได้เป็น 2 กลุ่มใหญ่:"
+      ], bullets:[
+        "<b>ทางกายภาพ</b> — รังสี UV, X-ray, รังสีแกมมา (Co-60) รังสี UV ทำให้ไทมีนที่อยู่ติดกันเชื่อมกันเป็น thymine dimer ซึ่งขัดขวางการจำลอง DNA",
+        "<b>ทางเคมี</b> — สาร alkylating agent เช่น EMS (Ethyl methanesulfonate) ที่เติมหมู่อัลคิลเข้าไปเปลี่ยนคุณสมบัติการจับคู่เบส และสาร colchicine ที่ยับยั้งการสร้างเส้นใยสปินเดิล"
+      ]},
+      {type:"quiz", id:"m3e3", tag:"แบบฝึกหัดที่ 3", topic:"สารก่อกลายพันธุ์ (Mutagens)", q:"การได้รับรังสี UV เป็นเวลานานทำให้เกิด \"thymine dimer\" ซึ่งจัดเป็นผลจากสารก่อกลายพันธุ์ประเภทใด?",
+        choices:["สารก่อกลายพันธุ์ทางเคมี (Chemical mutagen)","สารก่อกลายพันธุ์ทางกายภาพ (Physical mutagen)","Alkylating agent","Base analog"],
+        correct:1, explain:"รังสี UV เป็นสารก่อกลายพันธุ์ทางกายภาพ (physical mutagen) ที่ทำให้ไทมีนที่อยู่ติดกันบนสาย DNA เชื่อมกันกลายเป็น thymine dimer"},
+      {type:"text", heading:"4) กลไกการซ่อมแซม DNA", body:[
+        "เซลล์มีระบบซ่อมแซมความเสียหายของ DNA หลายกลไก แต่ละกลไกเหมาะกับความเสียหายคนละแบบ:"
+      ], bullets:[
+        "<b>Photoreactivation repair</b> — ใช้เอนไซม์ photolyase ซ่อม thymine dimer โดยอาศัยแสง",
+        "<b>Base excision repair (BER)</b> — ตัดเฉพาะเบสที่เสียหาย เช่น จาก depurination (พิวรีนหลุดหาย) หรือ deamination (ไซโทซีนกลายเป็นยูราซิล)",
+        "<b>Nucleotide excision repair (NER)</b> — ตัดเป็นช่วงนิวคลีโอไทด์ที่มีความเสียหายขนาดใหญ่กว่า เช่น thymine dimer",
+        "<b>Mismatch repair</b> — แก้ไขคู่เบสที่จับคู่ผิดพลาดหลังการจำลอง DNA",
+        "<b>Double-strand break repair</b> — ซ่อมแซมสายขาดทั้งสองข้างด้วยวิธี Non-homologous end joining (NHEJ) หรือ Homologous recombination (HR)"
+      ]},
+      {type:"quiz", id:"m3e4", tag:"แบบฝึกหัดที่ 4", topic:"กลไกการซ่อมแซม DNA", q:"คู่เบสที่จับคู่ผิดพลาด (mismatch) ซึ่งหลุดรอดจากการตรวจสอบของ DNA polymerase ระหว่างการจำลองตัว จะถูกแก้ไขด้วยกลไกใด?",
+        choices:["Photoreactivation repair","Nucleotide excision repair","Mismatch repair","Base excision repair"],
+        correct:2, explain:"Mismatch repair เป็นกลไกเฉพาะที่ตรวจจับและแก้ไขคู่เบสที่จับคู่ผิดพลาดหลังการจำลอง DNA ซึ่งต่างจาก BER/NER ที่เน้นซ่อมเบสหรือนิวคลีโอไทด์ที่เสียหายทางเคมี/กายภาพ"},
+      {type:"text", heading:"5) การรีคอมบิเนชันของ DNA", body:[
+        "การรีคอมบิเนชัน (Recombination) คือกระบวนการที่ DNA สองสายมีการแลกเปลี่ยนชิ้นส่วนกัน แบ่งเป็น 2 แบบหลัก:"
+      ], bullets:[
+        "<b>General recombination</b> — เกิดระหว่าง DNA สองโมเลกุลที่เป็น homolog กัน (เช่น ระหว่างไมโอซิส) ตำแหน่งแลกเปลี่ยนเกิดได้ทุกจุด และผ่านสถานะกลางที่เรียกว่า <i>Holliday junction</i>",
+        "<b>Site-specific recombination</b> — เคลื่อนย้ายลำดับเฉพาะ (mobile genetic elements หรือ transposon) ไปยังตำแหน่งใหม่ที่ไม่ใช่ homolog กัน โดยอาศัยเอนไซม์ transposase"
+      ]},
+      {type:"quiz", id:"m3e5", tag:"แบบฝึกหัดที่ 5", topic:"การรีคอมบิเนชันของ DNA", q:"การไขว้แลกเปลี่ยนสายระหว่างโครโมโซมคู่ homolog ในไมโอซิส ซึ่งผ่านสถานะกลางแบบ \"Holliday junction\" จัดเป็นการรีคอมบิเนชันชนิดใด?",
+        choices:["Site-specific recombination (transpositional)","Site-specific recombination (conservative)","General recombination","Base excision repair"],
+        correct:2, explain:"การแลกเปลี่ยนระหว่างโครโมโซม homolog ที่ตำแหน่งใดก็ได้ ผ่าน Holliday junction เป็นสถานะกลาง คือลักษณะเฉพาะของ General recombination ซึ่งพบในกระบวนการครอสซิงโอเวอร์ระหว่างไมโอซิส"},
+      {type:"text", heading:"6) การประยุกต์ใช้ในการปรับปรุงพันธุ์พืช", body:[
+        "ความรู้เรื่องมิวเทชันถูกนำไปประยุกต์ใช้ในงานปรับปรุงพันธุ์พืชอย่างกว้างขวาง เช่น การใช้สาร EMS เหนี่ยวนำให้เกิด point mutation เพื่อสร้างความหลากหลายทางพันธุกรรมใหม่ในประชากรพืช",
+        "ส่วนสาร colchicine ใช้ยับยั้งการสร้างเส้นใยสปินเดิลระหว่างการแบ่งเซลล์ ทำให้ชุดโครโมโซมเพิ่มเป็นสองเท่า (เหนี่ยวนำให้เกิด polyploidy) ซึ่งมักทำให้ได้พืชที่มีขนาดใหญ่และแข็งแรงกว่าเดิม"
+      ]},
+      {type:"quiz", id:"m3e6", tag:"แบบฝึกหัดที่ 6", topic:"การประยุกต์ใช้ในการปรับปรุงพันธุ์พืช", q:"การใช้สาร colchicine ในการปรับปรุงพันธุ์พืชมีผลอย่างไรต่อโครโมโซม?",
+        choices:[
+          "ทำให้เกิด point mutation แบบ transition",
+          "ยับยั้งการสร้างเส้นใยสปินเดิล ทำให้ชุดโครโมโซมเพิ่มขึ้นเป็นสองเท่า (polyploidy)",
+          "ตัดโครโมโซมให้สั้นลง (deletion)",
+          "เร่งการซ่อมแซม DNA ด้วย mismatch repair"
+        ],
+        correct:1, explain:"Colchicine ยับยั้งการประกอบตัวของ tubulin ทำให้เส้นใยสปินเดิลสร้างไม่ได้ โครโมโซมที่จำลองตัวแล้วจึงไม่ถูกดึงแยกออกจากกัน ส่งผลให้เซลล์มีชุดโครโมโซมเพิ่มเป็นสองเท่า (autopolyploidy)"}
+    ]
+  }
+];
+
+/* ================= BACKEND CONFIG =================
+   วางลิงก์ Web App ที่ได้จากการ Deploy Google Apps Script (ลงท้ายด้วย /exec) ไว้ระหว่างเครื่องหมายคำพูดด้านล่าง
+   ดูขั้นตอนการติดตั้งได้ในไฟล์คู่มือที่แนบมาพร้อมกัน (KAAG208_คู่มือติดตั้งฐานข้อมูล.md)
+   ถ้าปล่อยว่างไว้ เว็บจะทำงานในโหมดออฟไลน์ (เก็บข้อมูลในเบราว์เซอร์ชั่วคราวเท่านั้น ไม่ตรวจสอบข้ามอุปกรณ์) */
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFGV_6cE6lVMdTywpTDUoqpbRB3t4xxvjALWQEwF90mXUadpp-Rlk-CuLYUW44rv0GfQ/exec";
+
+function apiEnabled(){ return !!APPS_SCRIPT_URL; }
+
+/* เรียก Apps Script ผ่านแท็ก <script> (JSONP) แทน fetch() ตรง ๆ
+ * เพราะ fetch() ข้ามโดเมนไปยัง Apps Script /exec มักโดน CORS/redirect บล็อกจากฝั่งเบราว์เซอร์
+ * แม้ฝั่งเซิร์ฟเวอร์จะรันสำเร็จก็ตาม — <script> tag ไม่ถูกจำกัดด้วย CORS แบบเดียวกับ fetch/XHR */
+let _jsonpCounter = 0;
+function apiCall(params){
+  return new Promise((resolve, reject)=>{
+    const cbName = "__kaag208_cb_" + (_jsonpCounter++) + "_" + Date.now();
+    const timeoutId = setTimeout(()=>{ cleanup(); reject(new Error("หมดเวลาเชื่อมต่อฐานข้อมูล")); }, 15000);
+
+    function cleanup(){
+      clearTimeout(timeoutId);
+      delete window[cbName];
+      if(script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[cbName] = (data)=>{ cleanup(); resolve(data); };
+
+    const url = APPS_SCRIPT_URL + "?" + new URLSearchParams(Object.assign({}, params, {callback:cbName})).toString();
+    const script = document.createElement("script");
+    script.src = url;
+    script.onerror = ()=>{ cleanup(); reject(new Error("โหลดข้อมูลจากฐานข้อมูลไม่สำเร็จ")); };
+    document.head.appendChild(script);
+  });
+}
+async function apiCheckin(sid, email, name, session){
+  return apiCall({action:"checkin", sid, email, name, session});
+}
+async function apiComplete(sid, session){
+  return apiCall({action:"complete", sid, session});
+}
+async function apiStatus(sid){
+  return apiCall({action:"status", sid});
+}
+async function apiLogAnswer(sid, session, topic, quizId, correct){
+  return apiCall({action:"logAnswer", sid, session, topic, quizId, correct: correct ? "true" : "false"});
+}
+async function apiInsights(sid){
+  return apiCall({action:"insights", sid});
+}
+async function apiPrePost(sid, email, name, session, phase, score, total){
+  return apiCall({action:"prepost", sid, email, name, session, phase, score, total});
+}
+
+async function refreshDbStatus(){
+  const el = document.getElementById("dbStatusLine");
+  if(!el) return;
+  if(!apiEnabled()){
+    el.textContent = "⚪ โหมดออฟไลน์ — ยังไม่ได้ตั้งค่าฐานข้อมูล (เช็คชื่อ/ความคืบหน้าจะเก็บในเบราว์เซอร์นี้ชั่วคราวเท่านั้น)";
+    return;
+  }
+  try{
+    await apiCall({action:"status", sid:"__ping__"});
+    el.textContent = "🟢 เชื่อมต่อฐานข้อมูลแล้ว — การเช็คชื่อและความคืบหน้าจะถูกบันทึกไว้ถาวร";
+  }catch(err){
+    el.textContent = "🔴 เชื่อมต่อฐานข้อมูลไม่สำเร็จ — ตรวจสอบลิงก์ Apps Script และการเชื่อมต่ออินเทอร์เน็ต";
+  }
+}
+
+/* ================= STATE ================= */
+const state = {}; // { m1e1: {answered:true/false, correct:true/false} }
+state.checkins = {}; // { m1: {name, sid, email, time} }
+state.completedLogged = {}; // { m1: true } — กันการยิง apiComplete ซ้ำ
+state.prepost = {}; // { m1: { pre:[true,false,null,...], post:[...] } }
+state.prepostLogged = {}; // { m1: { pre:true, post:true } } — กันการยิง apiPrePost ซ้ำ
+let currentPage = "home";
+
+/* ================= RENDER ================= */
+function totalQuizCount(){
+  return MODULES.reduce((sum,m)=>sum+m.sections.filter(s=>s.type==="quiz").length,0);
+}
+function correctCount(moduleId){
+  const mod = MODULES.find(m=>m.id===moduleId);
+  return mod.sections.filter(s=>s.type==="quiz" && state[s.id] && state[s.id].correct).length;
+}
+function totalCorrect(){
+  return MODULES.reduce((sum,m)=>sum+correctCount(m.id),0);
+}
+function isModuleComplete(modId){
+  const mod = MODULES.find(m=>m.id===modId);
+  const total = mod.sections.filter(s=>s.type==="quiz").length;
+  return correctCount(modId) === total;
+}
+function allModulesComplete(){
+  return MODULES.every(m=>isModuleComplete(m.id));
+}
+function moduleStatusListHtml(){
+  return MODULES.map(m=>{
+    const total = m.sections.filter(s=>s.type==="quiz").length;
+    const done = correctCount(m.id);
+    const ok = done===total;
+    const checked = !!state.checkins[m.id];
+    return `<li>${ok?"✅":"🔒"} ครั้งที่ ${m.badge} (${m.title}): ${done}/${total} ข้อ${checked?"":" · ยังไม่เช็คชื่อเข้าเรียน"}</li>`;
+  }).join("");
+}
+
+function renderTabs(){
+  const bar = document.getElementById("tabBar");
+  const items = [{id:"home", label:"🏠 หน้าแรก"}].concat(
+    MODULES.map(m=>({id:m.id, label:`${m.icon} ครั้งที่ ${m.badge}${state.checkins[m.id]?" ✓":""}`}))
+  ).concat([{id:"insights", label:"📊 ผลวิเคราะห์การเรียนของฉัน"}, {id:"exam", label:"📝 แบบทดสอบจริง"}]);
+  bar.innerHTML = items.map(it=>`<button class="tab-btn${it.id===currentPage?" active":""}" data-page="${it.id}">${it.label}</button>`).join("");
+  bar.querySelectorAll(".tab-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>showPage(btn.dataset.page));
+  });
+}
+
+function showPage(id){
+  currentPage = id;
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active", b.dataset.page===id));
+  window.scrollTo({top:0, behavior:"smooth"});
+  if(id === "exam" && typeof examPhase === "function" && examPhase() !== lastExamPhase){
+    renderExamPage();
+  }
+}
+
+function renderHome(){
+  const el = document.getElementById("page-home");
+  const cards = MODULES.map(m=>{
+    const total = m.sections.filter(s=>s.type==="quiz").length;
+    const done = correctCount(m.id);
+    const pct = Math.round(done/total*100);
+    const checkin = state.checkins[m.id];
+    const attendanceLine = checkin
+      ? `<p style="font-size:.78rem;color:var(--ok-text);font-weight:600;margin:0;">✅ เช็คชื่อแล้ว: ${checkin.name}</p>`
+      : `<p style="font-size:.78rem;color:var(--muted);margin:0;">⬜ ยังไม่ได้เช็คชื่อเข้าเรียน</p>`;
+    return `
+    <div class="module-card" data-page="${m.id}">
+      <div class="module-badge" style="background:${m.color}">${m.icon}</div>
+      <h3>ครั้งที่ ${m.badge}: ${m.title}</h3>
+      <p>${m.cardDesc}</p>
+      ${attendanceLine}
+      <div class="card-progress-row">
+        <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%;background:${m.color}"></div></div>
+        <span class="card-score" id="cardscore-${m.id}">${done}/${total}</span>
+      </div>
+    </div>`;
+  }).join("");
+
+  el.innerHTML = `
+    <div class="home-hero">
+      <h2>ยินดีต้อนรับสู่บทเรียนออนไลน์ 🌾</h2>
+      <p>เว็บนี้รวบรวมเนื้อหาสรุปจากสไลด์ประกอบการสอนรายวิชา KAAG208 & 304: Genetics for Agriculture ทั้ง 3 หัวข้อ พร้อมแบบฝึกหัดสั้น ๆ แทรกไว้ในจุดสำคัญของแต่ละครั้งเรียน เพื่อให้ทบทวนและเช็คความเข้าใจได้ทันที</p>
+      <div class="how-to">
+        <b>วิธีใช้งาน:</b> เลือกหัวข้อที่ต้องการ (ครั้งที่ 1–3 ตามลำดับ) → เช็คชื่อเข้าเรียน (ยืนยันตัวตน) ด้วยชื่อ รหัสนักศึกษา และอีเมล ก่อนเริ่มเนื้อหาแต่ละครั้ง (ระบบจะตรวจว่าทำครั้งก่อนหน้าครบแล้วหรือยัง ถ้ายังจะให้ไปทำครั้งก่อนหน้าก่อน) → ทำ <b>แบบทดสอบก่อนเรียน</b> สั้น ๆ → อ่านเนื้อหาและทำแบบฝึกหัดที่แทรกอยู่ระหว่างเนื้อหา → ทำ <b>แบบทดสอบหลังเรียน</b> เพื่อทบทวนอีกครั้ง (แบบทดสอบก่อน/หลังเรียนไม่นับคะแนนและไม่มีผลต่อการปลดล็อก) → เมื่อทำแบบฝึกหัดถูกครบทุกข้อในครั้งที่ 1–3 แล้ว ไปที่แท็บ <b>"📝 แบบทดสอบจริง"</b> เพื่อกรอกรหัสนักศึกษาตรวจสอบสิทธิ์และเข้าทำแบบทดสอบเก็บคะแนนจริง (เปิดให้ทำเฉพาะวันที่ 26 กันยายน 2569 เวลา 10:30–12:30 น.)
+      </div>
+    </div>
+    <div class="module-grid">${cards}</div>
+  `;
+  el.querySelectorAll(".module-card").forEach(c=>c.addEventListener("click", ()=>showPage(c.dataset.page)));
+}
+
+function renderTable(t){
+  const head = `<tr>${t.head.map(h=>`<th>${h}</th>`).join("")}</tr>`;
+  const rows = t.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+  return `<table class="mini">${head}${rows}</table>`;
+}
+
+function renderSection(sec, idx){
+  if(sec.type==="text"){
+    const paras = sec.body.map(b=>`<p>${b}</p>`).join("");
+    const bullets = sec.bullets ? `<ul>${sec.bullets.map(b=>`<li>${b}</li>`).join("")}</ul>` : "";
+    const table = sec.table ? renderTable(sec.table) : "";
+    const note = sec.note ? `<div class="note">${sec.note}</div>` : "";
+    return `<div class="section-block">
+      <h3><span class="num">${idx}</span>${sec.heading}</h3>
+      ${paras}${table}${bullets}${note}
+    </div>`;
+  }
+  if(sec.type==="quiz"){
+    const choiceHtml = sec.choices.map((c,i)=>`
+      <label class="choice" data-idx="${i}">
+        <input type="radio" name="${sec.id}" value="${i}">
+        <span>${c}</span>
+      </label>`).join("");
+    return `<div class="quiz-block" id="qb-${sec.id}">
+      <span class="quiz-tag">${sec.tag}</span>
+      <p class="quiz-q">${sec.q}</p>
+      <div class="choices">${choiceHtml}</div>
+      <div class="quiz-actions">
+        <button class="btn" id="submit-${sec.id}">ตรวจคำตอบ</button>
+        <button class="btn secondary" id="retry-${sec.id}" style="display:none">ลองใหม่</button>
+      </div>
+      <div class="feedback" id="fb-${sec.id}"></div>
+    </div>`;
+  }
+  return "";
+}
+
+function renderPrePostBlock(mod, phase){
+  const label = phase === "pre" ? "แบบทดสอบก่อนเรียน" : "แบบทดสอบหลังเรียน";
+  const tagClass = phase === "pre" ? "pretest" : "posttest";
+  const desc = phase === "pre"
+    ? "ทำแบบทดสอบสั้น ๆ นี้ก่อนเริ่มอ่านเนื้อหา เพื่อประเมินความรู้พื้นฐานของตนเองก่อนเรียน (ระบบจะยังไม่เฉลยคำตอบตอนนี้ แต่จะเก็บข้อมูลไว้เทียบกับแบบทดสอบหลังเรียน — ไม่นับคะแนนและไม่มีผลต่อการปลดล็อกใด ๆ)"
+    : "ทำแบบทดสอบชุดเดิมอีกครั้งหลังเรียนจบ เพื่อเช็คว่าความเข้าใจดีขึ้นหรือไม่ (ไม่นับคะแนนและไม่มีผลต่อการปลดล็อกใด ๆ)";
+  const items = mod.prepost.map((q,i)=>{
+    const id = `${mod.id}-${phase}-${i}`;
+    const choiceHtml = q.choices.map((c,ci)=>`
+      <label class="choice" data-idx="${ci}">
+        <input type="radio" name="${id}" value="${ci}">
+        <span>${c}</span>
+      </label>`).join("");
+    return `
+      <div class="quiz-item" id="qb-${id}" style="margin-bottom:14px;">
+        <p class="quiz-q">${i+1}. ${q.q}</p>
+        <div class="choices">${choiceHtml}</div>
+        <div class="quiz-actions">
+          <button class="btn" id="submit-${id}">ตรวจคำตอบ</button>
+          <button class="btn secondary" id="retry-${id}" style="display:none">ลองใหม่</button>
+        </div>
+        <div class="feedback" id="fb-${id}"></div>
+      </div>`;
+  }).join("");
+  return `<div class="quiz-block prepost-block">
+    <span class="quiz-tag ${tagClass}">${label}</span>
+    <p style="font-size:.88rem;color:var(--muted);margin:0 0 12px;">${desc}</p>
+    ${items}
+  </div>`;
+}
+
+function bindPrePostBlock(mod, phase){
+  state.prepost[mod.id] = state.prepost[mod.id] || {};
+  state.prepost[mod.id][phase] = new Array(mod.prepost.length).fill(null);
+
+  mod.prepost.forEach((q,i)=>{
+    const id = `${mod.id}-${phase}-${i}`;
+    const box = document.getElementById("qb-"+id);
+    const submitBtn = document.getElementById("submit-"+id);
+    const retryBtn = document.getElementById("retry-"+id);
+    const fb = document.getElementById("fb-"+id);
+
+    submitBtn.addEventListener("click", ()=>{
+      const checked = box.querySelector(`input[name="${id}"]:checked`);
+      if(!checked){
+        fb.className = "feedback err";
+        fb.innerHTML = "<b>โปรดเลือกคำตอบก่อนตรวจ</b>";
+        return;
+      }
+      const chosen = parseInt(checked.value,10);
+      const isCorrect = chosen === q.correct;
+
+      if(phase === "pre"){
+        // แบบทดสอบก่อนเรียน: ไม่เฉลยคำตอบ แค่บันทึกไว้เทียบกับหลังเรียน
+        fb.className = "feedback ok";
+        fb.innerHTML = "<b>✅ บันทึกคำตอบแล้ว</b>ระบบจะยังไม่เฉลยข้อนี้ตอนนี้ — จะให้เทียบผลกับแบบทดสอบหลังเรียนเมื่อเรียนจบ";
+        submitBtn.style.display = "none";
+        box.querySelectorAll("input").forEach(inp=>inp.disabled=true);
+      } else {
+        box.querySelectorAll(".choice").forEach(ch=>{
+          const ci = parseInt(ch.dataset.idx,10);
+          ch.classList.remove("correct","wrong");
+          if(ci===q.correct) ch.classList.add("correct");
+          else if(ci===chosen && !isCorrect) ch.classList.add("wrong");
+        });
+        fb.className = "feedback " + (isCorrect ? "ok" : "err");
+        fb.innerHTML = `<b>${isCorrect ? "✅ ถูกต้อง!" : "❌ ยังไม่ถูก"}</b>${q.explain}`;
+        submitBtn.style.display = "none";
+        retryBtn.style.display = "inline-block";
+        box.querySelectorAll("input").forEach(inp=>inp.disabled=true);
+      }
+
+      state.prepost[mod.id][phase][i] = isCorrect;
+      maybeLogPrePost(mod, phase);
+    });
+
+    retryBtn.addEventListener("click", ()=>{
+      box.querySelectorAll(".choice").forEach(ch=>ch.classList.remove("correct","wrong"));
+      box.querySelectorAll("input").forEach(inp=>{inp.disabled=false; inp.checked=false;});
+      fb.className = "feedback";
+      fb.innerHTML = "";
+      submitBtn.style.display = "inline-block";
+      retryBtn.style.display = "none";
+    });
+  });
+}
+
+function maybeLogPrePost(mod, phase){
+  const answers = state.prepost[mod.id][phase];
+  if(answers.some(v=>v===null)) return; // ยังตอบไม่ครบทุกข้อ
+
+  state.prepostLogged[mod.id] = state.prepostLogged[mod.id] || {};
+  if(state.prepostLogged[mod.id][phase]) return; // กันยิงซ้ำ
+
+  const checkin = state.checkins[mod.id];
+  if(!checkin) return;
+
+  state.prepostLogged[mod.id][phase] = true;
+  const score = answers.filter(v=>v===true).length;
+  const total = answers.length;
+
+  if(apiEnabled() && !checkin.offlineFallback){
+    apiPrePost(checkin.sid, checkin.email, checkin.name, mod.badge, phase, score, total)
+      .catch(()=>{ state.prepostLogged[mod.id][phase] = false; });
+  }
+}
+
+function checkinTemplate(mod){
+  const idx = MODULES.findIndex(m=>m.id===mod.id);
+  const prereq = idx>0 ? MODULES[idx-1] : null;
+  const prereqNote = prereq
+    ? `<div class="checkin-note">🔒 ครั้งนี้ต้องทำแบบฝึกหัดในครั้งที่ ${prereq.badge} ให้ถูกครบก่อน ระบบจะตรวจสอบจากฐานข้อมูลให้อัตโนมัติเมื่อกดเช็คชื่อ</div>`
+    : "";
+  return `
+    <div class="module-header">
+      <h2>${mod.icon} ครั้งที่ ${mod.badge}: ${mod.title}</h2>
+      <p class="meta">${mod.subtitle}</p>
+    </div>
+    <div class="checkin-block">
+      <h3>📋 เช็คชื่อเข้าเรียนก่อนเริ่มเนื้อหาครั้งที่ ${mod.badge}</h3>
+      <p>กรุณากรอกข้อมูลให้ครบ เพื่อเช็คชื่อเข้าเรียนก่อนเริ่มอ่านเนื้อหาและทำแบบฝึกหัดในครั้งนี้</p>
+      <div class="checkin-field">
+        <label for="ci-name-${mod.id}">ชื่อ-นามสกุล</label>
+        <input type="text" id="ci-name-${mod.id}" placeholder="เช่น นางสาวใจดี เรียนเก่ง">
+      </div>
+      <div class="checkin-field">
+        <label for="ci-sid-${mod.id}">รหัสนักศึกษา</label>
+        <input type="text" id="ci-sid-${mod.id}" placeholder="เช่น 6512345678">
+      </div>
+      <div class="checkin-field">
+        <label for="ci-email-${mod.id}">อีเมลนักศึกษา</label>
+        <input type="email" id="ci-email-${mod.id}" placeholder="เช่น 6512345678@student.mahidol.ac.th">
+      </div>
+      <button class="btn" id="ci-submit-${mod.id}">เช็คชื่อเข้าเรียน &amp; เริ่มเรียน</button>
+      <p class="checkin-error" id="ci-err-${mod.id}">กรุณากรอกชื่อ-นามสกุล รหัสนักศึกษา และอีเมล (รูปแบบถูกต้อง) ให้ครบก่อน</p>
+      <div class="ci-block-msg" id="ci-block-${mod.id}"></div>
+      <div class="ci-warn-msg" id="ci-warn-${mod.id}"></div>
+      ${prereqNote}
+      <div class="checkin-note">ℹ️ ข้อมูลนี้จะถูกบันทึกลงฐานข้อมูลกลาง (Google Sheet ของอาจารย์) พร้อมวันเวลา เพื่อใช้ตรวจสอบการเข้าเรียนและปลดล็อกแบบทดสอบจริงในภายหลัง</div>
+    </div>
+  `;
+}
+
+async function bindCheckin(mod){
+  const btn = document.getElementById("ci-submit-"+mod.id);
+  const err = document.getElementById("ci-err-"+mod.id);
+  const blockEl = document.getElementById("ci-block-"+mod.id);
+  const warnEl = document.getElementById("ci-warn-"+mod.id);
+
+  btn.addEventListener("click", async ()=>{
+    err.classList.remove("show");
+    blockEl.classList.remove("show");
+    warnEl.classList.remove("show");
+
+    const name = document.getElementById("ci-name-"+mod.id).value.trim();
+    const sid = document.getElementById("ci-sid-"+mod.id).value.trim();
+    const email = document.getElementById("ci-email-"+mod.id).value.trim();
+    if(!name || !sid || !email || !email.includes("@")){
+      err.classList.add("show");
+      return;
+    }
+
+    const idx = MODULES.findIndex(m=>m.id===mod.id);
+    const prereq = idx>0 ? MODULES[idx-1] : null;
+
+    btn.disabled = true;
+    const originalLabel = btn.textContent;
+    btn.textContent = "กำลังตรวจสอบ...";
+
+    let offlineFallback = !apiEnabled();
+
+    if(apiEnabled()){
+      try{
+        if(prereq){
+          const status = await apiStatus(sid);
+          const done = status.ok && status.completions && status.completions.includes(prereq.badge);
+          if(!done){
+            blockEl.classList.add("show");
+            blockEl.innerHTML = `🔒 รหัสนักศึกษา <b>${sid}</b> ยังไม่พบข้อมูลว่าทำแบบฝึกหัดครั้งที่ ${prereq.badge} ครบถูกต้องในฐานข้อมูล กรุณาไปทำครั้งที่ ${prereq.badge} ให้เสร็จก่อน<br>
+              <button class="btn" id="ci-goto-${mod.id}">ไปครั้งที่ ${prereq.badge} &rarr;</button>`;
+            document.getElementById("ci-goto-"+mod.id).addEventListener("click", ()=>showPage(prereq.id));
+            btn.disabled = false;
+            btn.textContent = originalLabel;
+            return;
+          }
+        }
+        await apiCheckin(sid, email, name, mod.badge);
+      }catch(e){
+        offlineFallback = true;
+      }
+    }
+
+    state.checkins[mod.id] = { name, sid, email, time: new Date().toLocaleString("th-TH"), offlineFallback };
+    renderModule(mod);
+    renderTabs();
+    renderHome();
+  });
+}
+
+function renderModule(mod){
+  const el = document.getElementById("page-"+mod.id);
+  const checkin = state.checkins[mod.id];
+
+  if(!checkin){
+    el.innerHTML = checkinTemplate(mod);
+    bindCheckin(mod);
+    return;
+  }
+
+  let counter = 0;
+  const sectionsHtml = mod.sections.map(s=>{
+    if(s.type==="text"){ counter++; return renderSection(s, counter); }
+    return renderSection(s, counter);
+  }).join("");
+
+  const total = mod.sections.filter(s=>s.type==="quiz").length;
+  const idx = MODULES.findIndex(m=>m.id===mod.id);
+  const nextMod = MODULES[idx+1];
+
+  const isLast = mod.id === "m3";
+  const endHtml = `
+    <div class="end-summary">
+      <h3>จบเนื้อหาครั้งที่ ${mod.badge} แล้ว! 🎉</h3>
+      <div class="end-score" id="endscore-${mod.id}">0 / ${total}</div>
+      <p style="margin:0 0 14px;opacity:.9;">คะแนนแบบฝึกหัดทบทวนของครั้งนี้ — ทำแบบฝึกหัดให้ถูกครบทุกข้อ ระบบจะบันทึกความคืบหน้าลงฐานข้อมูลให้อัตโนมัติ</p>
+      ${nextMod ? `<button class="next-btn" id="gonext-${mod.id}">ไปครั้งที่ ${nextMod.badge}: ${nextMod.title} →</button>` : `<button class="next-btn" id="gonext-${mod.id}">ไปหน้าแบบทดสอบจริง →</button>`}
+    </div>`;
+
+  const banner = checkin.offlineFallback
+    ? `<div class="checkin-banner" style="background:#FFF7E6;color:#8a6b00;">⚠️ เช็คชื่อในนาม: ${checkin.name} (รหัส ${checkin.sid}) · ${checkin.time} — บันทึกในเบราว์เซอร์นี้ชั่วคราว (เชื่อมต่อฐานข้อมูลไม่สำเร็จ)</div>`
+    : `<div class="checkin-banner">✅ เช็คชื่อเข้าเรียนแล้วในนาม: ${checkin.name} (รหัส ${checkin.sid}) · ${checkin.time}</div>`;
+
+  const pretestHtml = renderPrePostBlock(mod, "pre");
+  const posttestHtml = renderPrePostBlock(mod, "post");
+
+  el.innerHTML = `
+    <div class="module-header">
+      <h2>${mod.icon} ครั้งที่ ${mod.badge}: ${mod.title}</h2>
+      <p class="meta">${mod.subtitle} · แบบฝึกหัดทั้งหมด ${total} ข้อ</p>
+      <div class="module-progress">
+        <div class="mini-bar" style="height:9px;"><div class="mini-bar-fill" id="modbar-${mod.id}" style="width:0%;background:${mod.color};height:9px;"></div></div>
+        <p style="font-size:.82rem;color:var(--muted);margin:6px 0 0;" id="modlabel-${mod.id}">ทำถูกแล้ว 0 / ${total} ข้อ</p>
+      </div>
+      <div class="link-row">
+        <a class="link-btn" href="${mod.video}" target="_blank" rel="noopener">▶ วิดีโอทบทวนก่อนเรียน</a>
+      </div>
+      ${banner}
+    </div>
+    ${pretestHtml}
+    ${sectionsHtml}
+    ${posttestHtml}
+    ${endHtml}
+  `;
+
+  mod.sections.filter(s=>s.type==="quiz").forEach(sec=>bindQuiz(sec, mod));
+  bindPrePostBlock(mod, "pre");
+  bindPrePostBlock(mod, "post");
+  updateModuleProgress(mod.id);
+
+  const nb = document.getElementById("gonext-"+mod.id);
+  if(nb) nb.addEventListener("click", ()=>showPage(isLast ? "exam" : nextMod.id));
+}
+
+function bindQuiz(sec, mod){
+  const box = document.getElementById("qb-"+sec.id);
+  const submitBtn = document.getElementById("submit-"+sec.id);
+  const retryBtn = document.getElementById("retry-"+sec.id);
+  const fb = document.getElementById("fb-"+sec.id);
+
+  submitBtn.addEventListener("click", ()=>{
+    const checked = box.querySelector(`input[name="${sec.id}"]:checked`);
+    if(!checked){
+      fb.className = "feedback err";
+      fb.innerHTML = "<b>โปรดเลือกคำตอบก่อนตรวจ</b>";
+      return;
+    }
+    const chosen = parseInt(checked.value,10);
+    const isCorrect = chosen === sec.correct;
+    box.querySelectorAll(".choice").forEach(ch=>{
+      const i = parseInt(ch.dataset.idx,10);
+      ch.classList.remove("correct","wrong");
+      if(i===sec.correct) ch.classList.add("correct");
+      else if(i===chosen && !isCorrect) ch.classList.add("wrong");
+    });
+    fb.className = "feedback " + (isCorrect ? "ok" : "err");
+    fb.innerHTML = `<b>${isCorrect ? "✅ ถูกต้อง!" : "❌ ยังไม่ถูก"}</b>${sec.explain}`;
+
+    state[sec.id] = {answered:true, correct:isCorrect};
+    submitBtn.style.display = "none";
+    retryBtn.style.display = "inline-block";
+    box.querySelectorAll("input").forEach(i=>i.disabled=true);
+
+    updateModuleProgress(mod.id);
+    updateHomeCard(mod.id);
+    updateOverall();
+    maybeLogCompletion(mod);
+    logAnswerForAnalytics(sec, mod, isCorrect);
+  });
+
+  retryBtn.addEventListener("click", ()=>{
+    box.querySelectorAll(".choice").forEach(ch=>ch.classList.remove("correct","wrong"));
+    box.querySelectorAll("input").forEach(i=>{i.disabled=false; i.checked=false;});
+    fb.className = "feedback";
+    fb.innerHTML = "";
+    submitBtn.style.display = "inline-block";
+    retryBtn.style.display = "none";
+  });
+}
+
+function updateModuleProgress(modId){
+  const mod = MODULES.find(m=>m.id===modId);
+  const total = mod.sections.filter(s=>s.type==="quiz").length;
+  const done = correctCount(modId);
+  const pct = Math.round(done/total*100);
+  const bar = document.getElementById("modbar-"+modId);
+  const label = document.getElementById("modlabel-"+modId);
+  const end = document.getElementById("endscore-"+modId);
+  if(bar) bar.style.width = pct+"%";
+  if(label) label.textContent = `ทำถูกแล้ว ${done} / ${total} ข้อ`;
+  if(end) end.textContent = `${done} / ${total}`;
+}
+
+function updateHomeCard(modId){
+  const mod = MODULES.find(m=>m.id===modId);
+  const total = mod.sections.filter(s=>s.type==="quiz").length;
+  const done = correctCount(modId);
+  const scoreEl = document.getElementById("cardscore-"+modId);
+  if(scoreEl){
+    scoreEl.textContent = `${done}/${total}`;
+    const fill = scoreEl.previousElementSibling.querySelector(".mini-bar-fill");
+    fill.style.width = Math.round(done/total*100)+"%";
+  }
+}
+
+function updateOverall(){
+  const total = totalQuizCount();
+  const done = totalCorrect();
+  const pct = Math.round(done/total*100);
+  document.getElementById("overallBar").style.width = pct+"%";
+  document.getElementById("overallLabel").textContent = `ทำแบบฝึกหัดแล้ว ${done} / ${total} ข้อ`;
+}
+
+/* บันทึกทุกครั้งที่ตอบแบบฝึกหัด (ถูกหรือผิด) ไปยัง QuizLog เพื่อใช้คำนวณ Learning Analytics
+   (ความแม่นยำในความพยายามครั้งแรก, จำนวนครั้งที่ลองซ้ำ, หัวข้อที่ควรทบทวน) */
+function logAnswerForAnalytics(sec, mod, isCorrect){
+  const checkin = state.checkins[mod.id];
+  if(!checkin || checkin.offlineFallback || !apiEnabled()) return;
+  apiLogAnswer(checkin.sid, mod.badge, sec.topic || "", sec.id, isCorrect).catch(()=>{ /* เงียบไว้ ไม่รบกวนผู้ใช้ */ });
+}
+
+function maybeLogCompletion(mod){
+  if(!isModuleComplete(mod.id)) return;
+  if(state.completedLogged[mod.id]) return;
+  const checkin = state.checkins[mod.id];
+  if(!checkin) return;
+  state.completedLogged[mod.id] = true; // กันยิงซ้ำ
+  if(apiEnabled() && !checkin.offlineFallback){
+    apiComplete(checkin.sid, mod.badge).catch(()=>{ state.completedLogged[mod.id] = false; });
+  }
+}
+
+/* ================= LEARNING ANALYTICS PAGE (Insights) =================
+   หน้านี้เป็นส่วนของระบบ Learning Analytics แบบพยากรณ์ (predictive) ที่ดึงคะแนน "ระดับความพร้อม"
+   (risk score) และคำแนะนำหัวข้อที่ควรทบทวน ซึ่งคำนวณจริงจากพฤติกรรมการทำแบบฝึกหัดฝั่ง backend
+   (ดูสูตรคำนวณใน Code.gs — computeInsights_) ไม่ใช่ตัวเลขคงที่ที่ตั้งไว้ล่วงหน้า */
+function topicToModule(topic){
+  for(const m of MODULES){
+    for(const s of m.sections){
+      if(s.type==="quiz" && s.topic===topic) return m;
+    }
+  }
+  return null;
+}
+
+function riskBadgeHtml(level, label, score){
+  const cfg = {
+    good:{icon:"🟢", cls:"risk-good"},
+    warning:{icon:"🟡", cls:"risk-warning"},
+    serious:{icon:"🔴", cls:"risk-serious"},
+    no_data:{icon:"⚪", cls:"risk-nodata"}
+  }[level] || {icon:"⚪", cls:"risk-nodata"};
+  const scoreText = (score===null || score===undefined) ? "" : ` — ดัชนี ${score}/100`;
+  return `<div class="risk-badge ${cfg.cls}">${cfg.icon} <span>${label}${scoreText}</span></div>`;
+}
+
+function renderInsightsPage(){
+  const el = document.getElementById("page-insights");
+  el.innerHTML = `
+    <div class="exam-hero">
+      <h2>📊 ผลวิเคราะห์การเรียนของฉัน (Learning Analytics)</h2>
+      <p>ระบบวิเคราะห์พฤติกรรมการทำแบบฝึกหัดของคุณ — ความแม่นยำในการตอบครั้งแรก จำนวนครั้งที่ลองใหม่ และความคืบหน้าการเรียน — เพื่อประเมินระดับความพร้อมและแนะนำหัวข้อที่ควรทบทวนเพิ่มเติมเป็นรายบุคคล</p>
+    </div>
+    <div class="exam-gate">
+      <div class="checkin-field">
+        <label for="insights-sid">รหัสนักศึกษา</label>
+        <input type="text" id="insights-sid" placeholder="เช่น 6512345678">
+      </div>
+      <button class="btn" id="insights-check-btn">ดูผลวิเคราะห์</button>
+      <div class="exam-result" id="insights-result"></div>
+    </div>
+  `;
+  bindInsightsPage();
+}
+
+function bindInsightsPage(){
+  const btn = document.getElementById("insights-check-btn");
+  const resultEl = document.getElementById("insights-result");
+
+  btn.addEventListener("click", async ()=>{
+    const sid = document.getElementById("insights-sid").value.trim();
+    resultEl.className = "exam-result";
+    if(!sid){
+      resultEl.className = "exam-result err show";
+      resultEl.textContent = "กรุณากรอกรหัสนักศึกษาก่อน";
+      return;
+    }
+    if(!apiEnabled()){
+      resultEl.className = "exam-result err show";
+      resultEl.textContent = "⚠️ ฟีเจอร์นี้ต้องเชื่อมต่อฐานข้อมูลกลางก่อนจึงจะวิเคราะห์ได้ (ขณะนี้เว็บทำงานในโหมดออฟไลน์)";
+      return;
+    }
+
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = "กำลังวิเคราะห์...";
+    try{
+      const r = await apiInsights(sid);
+      if(!r.ok){
+        resultEl.className = "exam-result err show";
+        resultEl.textContent = "ไม่สามารถวิเคราะห์ได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง";
+      } else if(r.riskLevel === "no_data" || r.totalQuestionsAttempted === 0){
+        resultEl.className = "exam-result err show";
+        resultEl.innerHTML = "⚪ ยังไม่มีข้อมูลเพียงพอสำหรับวิเคราะห์ — เริ่มทำแบบฝึกหัดอย่างน้อย 1 ข้อในเนื้อหาแต่ละครั้งก่อน แล้วกลับมาดูผลวิเคราะห์อีกครั้ง";
+      } else {
+        const weakHtml = r.weakTopics.length
+          ? r.weakTopics.map(t=>{
+              const mod = topicToModule(t.topic);
+              return `<div class="weak-topic-card">
+                <div><b>${t.topic}</b><br><span style="font-size:.8rem;color:var(--muted);">ตอบผิดในความพยายามครั้งแรก ${t.wrongCount}/${t.totalCount} ข้อ (${Math.round(t.wrongRate*100)}%)</span></div>
+                ${mod ? `<button class="btn secondary" data-goto="${mod.id}">ไปทบทวน →</button>` : ""}
+              </div>`;
+            }).join("")
+          : `<p style="color:var(--ok-text);font-weight:600;">✅ ยังไม่พบหัวข้อที่ต้องทบทวนเป็นพิเศษ เก่งมาก!</p>`;
+
+        resultEl.className = "exam-result neutral show";
+        resultEl.innerHTML = `
+          ${riskBadgeHtml(r.riskLevel, r.riskLabel, r.riskScore)}
+          <div class="insights-stats">
+            <div class="insights-stat"><span class="num">${r.firstAttemptAccuracy!==null ? Math.round(r.firstAttemptAccuracy*100)+"%" : "-"}</span><span class="lbl">ตอบถูกในความพยายามครั้งแรก</span></div>
+            <div class="insights-stat"><span class="num">${r.avgAttempts ?? "-"}</span><span class="lbl">จำนวนครั้งที่ลองเฉลี่ย/ข้อ</span></div>
+            <div class="insights-stat"><span class="num">${r.completions.length}/3</span><span class="lbl">ครั้งเรียนที่ทำครบแล้ว</span></div>
+          </div>
+          <h4 style="margin:16px 0 8px;">📌 หัวข้อที่แนะนำให้ทบทวน</h4>
+          ${weakHtml}
+          <div class="analytics-note">ℹ️ ระดับความพร้อมนี้คำนวณจากพฤติกรรมการทำแบบฝึกหัดจริงของคุณเท่านั้น เป็นเครื่องมือช่วยแนะนำการทบทวน ไม่ใช่คะแนนเก็บของรายวิชา</div>
+        `;
+        resultEl.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click", ()=>showPage(b.dataset.goto)));
+      }
+    }catch(e){
+      resultEl.className = "exam-result err show";
+      resultEl.textContent = "⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูลได้ในขณะนี้ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่อีกครั้ง";
+    }
+    btn.disabled = false;
+    btn.textContent = original;
+  });
+}
+
+/* ================= EXAM PAGE ================= */
+/* แบบทดสอบเก็บคะแนนจริงเปิดให้ทำเฉพาะช่วงเวลาที่กำหนด (เวลาไทย UTC+7) */
+const EXAM_OPEN = new Date("2026-09-26T10:30:00+07:00");
+const EXAM_CLOSE = new Date("2026-09-26T12:30:00+07:00");
+const EXAM_SCHEDULE_TEXT = "วันที่ 26 กันยายน 2569 เวลา 10:30–12:30 น.";
+let lastExamPhase = null;
+
+function examPhase(){
+  const now = new Date();
+  if(now < EXAM_OPEN) return "before";
+  if(now > EXAM_CLOSE) return "after";
+  return "open";
+}
+
+function renderExamPage(){
+  const el = document.getElementById("page-exam");
+  const m3 = MODULES.find(m=>m.id==="m3");
+  const phase = examPhase();
+  lastExamPhase = phase;
+  const scheduleNote = `แบบทดสอบนี้เปิดให้ทำเฉพาะ <b>${EXAM_SCHEDULE_TEXT}</b> เท่านั้น`;
+
+  if(phase === "before"){
+    el.innerHTML = `
+      <div class="exam-hero">
+        <h2>📝 แบบทดสอบเก็บคะแนนจริง</h2>
+        <p>${scheduleNote}</p>
+      </div>
+      <div class="exam-gate">
+        <div class="exam-result err show">⏳ <b>ยังไม่ถึงเวลาเปิดสอบ</b><br>ระบบจะเปิดให้ทำแบบทดสอบ ${EXAM_SCHEDULE_TEXT} กรุณากลับมาเข้าลิงก์ใหม่ในวันและเวลาดังกล่าว</div>
+      </div>
+    `;
+    return;
+  }
+  if(phase === "after"){
+    el.innerHTML = `
+      <div class="exam-hero">
+        <h2>📝 แบบทดสอบเก็บคะแนนจริง</h2>
+        <p>${scheduleNote}</p>
+      </div>
+      <div class="exam-gate">
+        <div class="exam-result locked show">🔒 <b>หมดเวลาทำแบบทดสอบแล้ว</b><br>ช่วงเวลาที่เปิดให้ทำ (${EXAM_SCHEDULE_TEXT}) ได้สิ้นสุดลงแล้ว หากมีข้อสงสัยกรุณาติดต่ออาจารย์ผู้สอน</div>
+      </div>
+    `;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="exam-hero">
+      <h2>📝 แบบทดสอบเก็บคะแนนจริง</h2>
+      <p>${scheduleNote} แบบทดสอบนี้เป็นคะแนนเก็บจริงของรายวิชา จะทำได้ก็ต่อเมื่อเรียนและทำแบบฝึกหัดถูกครบทุกข้อในครั้งที่ 1, 2 และ 3 แล้วเท่านั้น กรอกรหัสนักศึกษาด้านล่างเพื่อตรวจสอบสิทธิ์ จากนั้นให้เข้าลิงก์ Google Form เพื่อยืนยันตัวตนและทำแบบทดสอบ</p>
+    </div>
+    <div class="exam-gate">
+      <div class="checkin-field">
+        <label for="exam-sid">รหัสนักศึกษา</label>
+        <input type="text" id="exam-sid" placeholder="เช่น 6512345678">
+      </div>
+      <button class="btn" id="exam-check-btn">ตรวจสอบสิทธิ์เข้าสอบ</button>
+      <div class="exam-result" id="exam-result"></div>
+    </div>
+  `;
+  bindExamPage();
+}
+
+setInterval(()=>{
+  if(examPhase() !== lastExamPhase && currentPage === "exam"){
+    renderExamPage();
+  }
+}, 15000);
+
+function bindExamPage(){
+  const btn = document.getElementById("exam-check-btn");
+  const resultEl = document.getElementById("exam-result");
+  const m3 = MODULES.find(m=>m.id==="m3");
+
+  btn.addEventListener("click", async ()=>{
+    const sid = document.getElementById("exam-sid").value.trim();
+    resultEl.className = "exam-result";
+    if(!sid){
+      resultEl.className = "exam-result err show";
+      resultEl.textContent = "กรุณากรอกรหัสนักศึกษาก่อน";
+      return;
+    }
+
+    if(!apiEnabled()){
+      // โหมดออฟไลน์: ตรวจจากข้อมูลในเบราว์เซอร์นี้เท่านั้น (ไม่ตรวจข้ามอุปกรณ์)
+      if(allModulesComplete()){
+        resultEl.className = "exam-result unlocked show";
+        resultEl.innerHTML = `🔓 <b>ปลดล็อกแล้ว (โหมดออฟไลน์)</b> — ตรวจสอบจากเบราว์เซอร์นี้เท่านั้น ยังไม่ได้เชื่อมต่อฐานข้อมูลกลาง<br><br>
+          <a class="link-btn" href="${m3.form}" target="_blank" rel="noopener">ไปทำแบบทดสอบเก็บคะแนนจริง (Google Form) →</a>`;
+      } else {
+        resultEl.className = "exam-result locked show";
+        resultEl.innerHTML = `🔒 ยังทำแบบฝึกหัดไม่ครบในเบราว์เซอร์นี้ (ยังไม่ได้เชื่อมต่อฐานข้อมูลกลาง จึงตรวจได้เฉพาะเครื่องนี้)<ul>${moduleStatusListHtml()}</ul>`;
+      }
+      return;
+    }
+
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = "กำลังตรวจสอบ...";
+    try{
+      const status = await apiStatus(sid);
+      const completions = (status.ok && status.completions) ? status.completions : [];
+      const missing = MODULES.filter(m=>!completions.includes(m.badge));
+      if(missing.length === 0){
+        resultEl.className = "exam-result unlocked show";
+        resultEl.innerHTML = `🔓 <b>ปลดล็อกแล้ว!</b> รหัสนักศึกษา ${sid} ทำแบบฝึกหัดถูกครบทุกข้อในครั้งที่ 1–3 เรียบร้อยแล้ว<br><br>
+          <a class="link-btn" href="${m3.form}" target="_blank" rel="noopener">ไปทำแบบทดสอบเก็บคะแนนจริง (Google Form) →</a>`;
+      } else {
+        resultEl.className = "exam-result locked show";
+        resultEl.innerHTML = `🔒 รหัสนักศึกษา ${sid} ยังทำไม่ครบ ต้องทำแบบฝึกหัดให้ถูกครบทุกข้อในครั้งต่อไปนี้ก่อน:
+          <ul>${missing.map(m=>`<li>❌ ครั้งที่ ${m.badge}: ${m.title}</li>`).join("")}</ul>`;
+      }
+    }catch(e){
+      resultEl.className = "exam-result err show";
+      resultEl.textContent = "⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูลได้ในขณะนี้ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่อีกครั้ง";
+    }
+    btn.disabled = false;
+    btn.textContent = original;
+  });
+}
+
+/* ================= INIT ================= */
+renderTabs();
+renderHome();
+MODULES.forEach(renderModule);
+renderInsightsPage();
+renderExamPage();
+updateOverall();
+showPage("home");
+refreshDbStatus();
+</script>
+</body>
+</html>

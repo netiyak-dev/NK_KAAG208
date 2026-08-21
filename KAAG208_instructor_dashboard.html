@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAAG208 — Learning Analytics Dashboard (สำหรับอาจารย์)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light;
+    --surface-1:#fcfcfb; --page:#f9f9f7;
+    --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#898781;
+    --gridline:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,0.10);
+    --seq-100:#cde2fb; --seq-250:#86b6ef; --seq-400:#3987e5; --seq-500:#256abf; --seq-650:#104281;
+    --status-good:#0ca30c; --status-warning:#fab219; --status-serious:#ec835a; --status-critical:#d03b3b;
+    --status-good-bg:#e9f8e9; --status-warning-bg:#fff6e2; --status-serious-bg:#fdece4; --status-nodata-bg:#eeeeec;
+    --card:#ffffff;
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:where(:not([data-theme="light"])){
+      color-scheme: dark;
+      --surface-1:#1a1a19; --page:#0d0d0d;
+      --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#898781;
+      --gridline:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+      --seq-100:#184f95; --seq-250:#1c5cab; --seq-400:#2a78d6; --seq-500:#3987e5; --seq-650:#86b6ef;
+      --status-good:#0ca30c; --status-warning:#fab219; --status-serious:#ec835a; --status-critical:#d03b3b;
+      --status-good-bg:#12291a; --status-warning-bg:#332a10; --status-serious-bg:#3a2116; --status-nodata-bg:#232322;
+      --card:#151514;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --surface-1:#1a1a19; --page:#0d0d0d;
+    --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#898781;
+    --gridline:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+    --seq-100:#184f95; --seq-250:#1c5cab; --seq-400:#2a78d6; --seq-500:#3987e5; --seq-650:#86b6ef;
+    --status-good:#0ca30c; --status-warning:#fab219; --status-serious:#ec835a; --status-critical:#d03b3b;
+    --status-good-bg:#12291a; --status-warning-bg:#332a10; --status-serious-bg:#3a2116; --status-nodata-bg:#232322;
+    --card:#151514;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Sarabun','Noto Sans Thai','Segoe UI',sans-serif;background:var(--page);color:var(--text-primary);line-height:1.6;}
+  .wrap{max-width:980px;margin:0 auto;padding:26px 20px 70px;}
+  h1,h2,h3,h4{margin:0;}
+  a{color:var(--seq-500);}
+
+  header.top{background:linear-gradient(135deg,#1F3864,#0F6B72);color:#fff;padding:26px 20px 22px;}
+  header.top .wrap{padding-bottom:0;}
+  .top-title{font-size:1.35rem;font-weight:800;margin:0 0 4px;}
+  .top-sub{font-size:.9rem;opacity:.92;margin:0;}
+
+  .gate{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:22px;}
+  .gate p{color:var(--text-secondary);font-size:.92rem;margin:0 0 14px;}
+  .gate-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .gate input{flex:1;min-width:220px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:.95rem;background:var(--surface-1);color:var(--text-primary);}
+  .btn{background:#1F3864;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+  .btn:hover{background:#0F6B72;}
+  .btn:disabled{background:var(--baseline);cursor:not-allowed;}
+  .btn.secondary{background:transparent;color:var(--seq-500);border:1px solid var(--seq-500);}
+  .gate-msg{margin-top:10px;font-size:.88rem;display:none;}
+  .gate-msg.show{display:block;}
+  .gate-msg.err{color:var(--status-critical);}
+
+  .config-note{font-size:.78rem;color:var(--text-muted);margin-top:12px;}
+
+  section.dash{display:none;}
+  section.dash.show{display:block;}
+
+  .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:22px;}
+  .stat-tile{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+  .stat-tile .val{font-size:1.9rem;font-weight:800;color:var(--text-primary);}
+  .stat-tile .lbl{font-size:.8rem;color:var(--text-secondary);margin-top:2px;}
+  .stat-tile.status-good{background:var(--status-good-bg);}
+  .stat-tile.status-warning{background:var(--status-warning-bg);}
+  .stat-tile.status-serious{background:var(--status-serious-bg);}
+  .stat-tile .icon{font-size:1rem;}
+
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-top:18px;}
+  .panel h2{font-size:1.08rem;color:var(--text-primary);margin-bottom:2px;}
+  .panel .sub{font-size:.82rem;color:var(--text-secondary);margin-bottom:14px;}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0;}
+  .toolbar select, .toolbar input[type=text]{
+    padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface-1);color:var(--text-primary);
+    font-family:inherit;font-size:.85rem;
+  }
+  .toolbar .spacer{flex:1;}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--text-secondary);margin:2px 0 14px;}
+  .legend .item{display:flex;align-items:center;gap:6px;}
+  .legend .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+
+  .bar-row{display:flex;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid var(--gridline);cursor:pointer;}
+  .bar-row:last-child{border-bottom:none;}
+  .bar-row:hover{background:color-mix(in srgb, var(--seq-100) 25%, transparent);}
+  .bar-row .label{width:190px;flex-shrink:0;font-size:.86rem;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .bar-row .label .sub{display:block;font-size:.72rem;color:var(--text-muted);}
+  .bar-track{flex:1;height:22px;background:var(--gridline);border-radius:4px;position:relative;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:4px 4px 4px 4px;position:relative;transition:width .3s;}
+  .bar-fill.textured{background-image:repeating-linear-gradient(45deg, rgba(0,0,0,.18) 0 2px, transparent 2px 6px);}
+  .bar-value{width:56px;flex-shrink:0;text-align:right;font-size:.82rem;font-weight:700;color:var(--text-primary);font-variant-numeric:tabular-nums;}
+  .bar-status-icon{width:20px;flex-shrink:0;text-align:center;}
+
+  .detail-panel{display:none;background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin:4px 0 10px;font-size:.85rem;}
+  .detail-panel.show{display:block;}
+  .detail-panel .weak-item{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--gridline);}
+  .detail-panel .weak-item:last-child{border-bottom:none;}
+
+  table.data-table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:6px;}
+  table.data-table th,table.data-table td{border:1px solid var(--gridline);padding:7px 9px;text-align:left;}
+  table.data-table th{background:var(--surface-1);color:var(--text-secondary);font-weight:700;position:sticky;top:0;}
+  table.data-table td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .table-wrap{overflow-x:auto;max-height:480px;overflow-y:auto;}
+
+  .empty-note{color:var(--text-muted);font-size:.88rem;padding:14px 0;text-align:center;}
+
+  footer{text-align:center;color:var(--text-muted);font-size:.78rem;padding:26px 20px;}
+
+  @media (max-width:600px){
+    .bar-row .label{width:120px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <p class="top-title">📊 KAAG208 & 304 — Learning Analytics Dashboard</p>
+    <p class="top-sub">มุมมองสำหรับอาจารย์ผู้สอน · ระบบพยากรณ์ความพร้อมของนักศึกษาและคำแนะนำหัวข้อที่ควรทบทวน (สำหรับอาจารย์เท่านั้น)</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="gate" id="gateBox">
+    <h2 style="margin-bottom:8px;">🔑 เข้าสู่ระบบอาจารย์</h2>
+    <p>กรอกรหัสผ่านอาจารย์ (ตั้งค่าไว้ที่ตัวแปร <code>INSTRUCTOR_KEY</code> ใน Code.gs) เพื่อดูภาพรวมความเสี่ยงและคำแนะนำของนักศึกษาทุกคน — ข้อมูลนี้เป็นข้อมูลส่วนบุคคลของนักศึกษา กรุณาอย่าเผยแพร่ลิงก์หน้านี้หรือรหัสผ่านต่อสาธารณะ</p>
+    <div class="gate-row">
+      <input type="password" id="keyInput" placeholder="รหัสผ่านอาจารย์ (Instructor Key)">
+      <button class="btn" id="loadBtn">โหลดข้อมูล</button>
+    </div>
+    <p class="gate-msg" id="gateMsg"></p>
+    <p class="config-note" id="dbConfigNote"></p>
+  </div>
+
+  <section class="dash" id="dashSection">
+
+    <div class="stat-row" id="statRow"></div>
+
+    <div class="panel">
+      <h2>🎯 อันดับความพร้อมของนักศึกษา (Predictive Risk Ranking)</h2>
+      <p class="sub">คำนวณจากพฤติกรรมการทำแบบฝึกหัดจริง: ความแม่นยำในการตอบครั้งแรก, จำนวนครั้งที่ลองซ้ำ, และความคืบหน้าการเรียน (ยิ่งแท่งยาว = ยิ่งควรได้รับการดูแลเพิ่มเติม) — คลิกแถวเพื่อดูรายละเอียดหัวข้อที่ควรทบทวน</p>
+      <div class="toolbar">
+        <select id="filterLevel">
+          <option value="all">ทุกระดับ</option>
+          <option value="serious">🔴 ควรช่วยเหลือเพิ่มเติม</option>
+          <option value="warning">🟡 ควรทบทวนเพิ่มเติม</option>
+          <option value="good">🟢 อยู่ในเกณฑ์ดี</option>
+          <option value="no_data">⚪ ยังไม่มีข้อมูล</option>
+        </select>
+        <input type="text" id="searchBox" placeholder="ค้นหาชื่อ / รหัสนักศึกษา">
+        <span class="spacer"></span>
+        <button class="btn secondary" id="textureToggle">🎨 โหมดไม่พึ่งสี (texture)</button>
+        <button class="btn secondary" id="tableToggle">📋 แสดงเป็นตาราง</button>
+      </div>
+      <div class="legend">
+        <span class="item"><span class="dot" style="background:var(--status-serious)"></span>🔴 ควรช่วยเหลือเพิ่มเติม (≥60)</span>
+        <span class="item"><span class="dot" style="background:var(--status-warning)"></span>🟡 ควรทบทวนเพิ่มเติม (30–59)</span>
+        <span class="item"><span class="dot" style="background:var(--status-good)"></span>🟢 อยู่ในเกณฑ์ดี (&lt;30)</span>
+        <span class="item"><span class="dot" style="background:var(--gridline)"></span>⚪ ยังไม่มีข้อมูล</span>
+      </div>
+      <div id="rankingList"></div>
+      <div id="tableView" style="display:none;">
+        <div class="table-wrap">
+          <table class="data-table" id="dataTable"></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>📌 หัวข้อที่นักศึกษาทั้งชั้นตอบผิดบ่อยที่สุด (ในความพยายามครั้งแรก)</h2>
+      <p class="sub">รวมข้อมูลจากนักศึกษาทุกคนที่มีข้อมูล — ใช้ระบุหัวข้อที่ควรอธิบายซ้ำหรือปรับเนื้อหาในครั้งถัดไป</p>
+      <div id="topicChart"></div>
+    </div>
+
+  </section>
+</main>
+
+<footer>
+  ข้อมูลนี้เป็นข้อมูลส่วนบุคคลของนักศึกษา ใช้เพื่อการดูแลและปรับปรุงการเรียนการสอนเท่านั้น · ดัชนีความเสี่ยงคำนวณจากพฤติกรรมจริงในระบบ ไม่ใช่คะแนนสอบ
+</footer>
+
+<script>
+/* ================= CONFIG =================
+   วางลิงก์ Apps Script Web App เดียวกับที่ใช้ในเว็บบทเรียนออนไลน์ (ลงท้ายด้วย /exec) */
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFGV_6cE6lVMdTywpTDUoqpbRB3t4xxvjALWQEwF90mXUadpp-Rlk-CuLYUW44rv0GfQ/exec";
+
+function apiEnabled(){ return !!APPS_SCRIPT_URL; }
+
+/* เรียก Apps Script ผ่านแท็ก <script> (JSONP) แทน fetch() ตรง ๆ
+ * เพราะ fetch() ข้ามโดเมนไปยัง Apps Script /exec มักโดน CORS/redirect บล็อกจากฝั่งเบราว์เซอร์
+ * แม้ฝั่งเซิร์ฟเวอร์จะรันสำเร็จก็ตาม — <script> tag ไม่ถูกจำกัดด้วย CORS แบบเดียวกับ fetch/XHR */
+let _jsonpCounter = 0;
+function apiCall(params){
+  return new Promise((resolve, reject)=>{
+    const cbName = "__kaag208_cb_" + (_jsonpCounter++) + "_" + Date.now();
+    const timeoutId = setTimeout(()=>{ cleanup(); reject(new Error("หมดเวลาเชื่อมต่อฐานข้อมูล")); }, 15000);
+
+    function cleanup(){
+      clearTimeout(timeoutId);
+      delete window[cbName];
+      if(script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[cbName] = (data)=>{ cleanup(); resolve(data); };
+
+    const url = APPS_SCRIPT_URL + "?" + new URLSearchParams(Object.assign({}, params, {callback:cbName})).toString();
+    const script = document.createElement("script");
+    script.src = url;
+    script.onerror = ()=>{ cleanup(); reject(new Error("โหลดข้อมูลจากฐานข้อมูลไม่สำเร็จ")); };
+    document.head.appendChild(script);
+  });
+}
+async function apiRiskAll(key){
+  return apiCall({action:"riskAll", key});
+}
+
+const STATUS_META = {
+  good:{icon:"🟢", label:"อยู่ในเกณฑ์ดี", color:"var(--status-good)"},
+  warning:{icon:"🟡", label:"ควรทบทวนเพิ่มเติม", color:"var(--status-warning)"},
+  serious:{icon:"🔴", label:"ควรช่วยเหลือเพิ่มเติม", color:"var(--status-serious)"},
+  no_data:{icon:"⚪", label:"ยังไม่มีข้อมูล", color:"var(--gridline)"}
+};
+
+let ALL_STUDENTS = [];
+let textureOn = false;
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  const note = document.getElementById("dbConfigNote");
+  note.textContent = apiEnabled()
+    ? ""
+    : "⚠️ ยังไม่ได้ตั้งค่า APPS_SCRIPT_URL ในไฟล์นี้ — เปิดไฟล์ด้วยโปรแกรมแก้ไขข้อความแล้วใส่ลิงก์ Apps Script เดียวกับที่ใช้ในเว็บบทเรียน (ดูคู่มือติดตั้งฐานข้อมูล)";
+
+  document.getElementById("loadBtn").addEventListener("click", loadData);
+  document.getElementById("keyInput").addEventListener("keydown", e=>{ if(e.key==="Enter") loadData(); });
+  document.getElementById("filterLevel").addEventListener("change", renderRanking);
+  document.getElementById("searchBox").addEventListener("input", renderRanking);
+  document.getElementById("tableToggle").addEventListener("click", toggleTable);
+  document.getElementById("textureToggle").addEventListener("click", ()=>{
+    textureOn = !textureOn;
+    document.getElementById("textureToggle").style.outline = textureOn ? "2px solid var(--seq-500)" : "none";
+    renderRanking();
+  });
+});
+
+async function loadData(){
+  const key = document.getElementById("keyInput").value.trim();
+  const msg = document.getElementById("gateMsg");
+  msg.className = "gate-msg";
+  if(!apiEnabled()){
+    msg.className = "gate-msg err show";
+    msg.textContent = "ยังไม่ได้ตั้งค่าลิงก์ฐานข้อมูล (APPS_SCRIPT_URL) ในไฟล์นี้";
+    return;
+  }
+  if(!key){
+    msg.className = "gate-msg err show";
+    msg.textContent = "กรุณากรอกรหัสผ่านอาจารย์";
+    return;
+  }
+  const btn = document.getElementById("loadBtn");
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = "กำลังโหลด...";
+  try{
+    const r = await apiRiskAll(key);
+    if(!r.ok){
+      msg.className = "gate-msg err show";
+      msg.textContent = r.error === "invalid key" ? "รหัสผ่านไม่ถูกต้อง" : ("เกิดข้อผิดพลาด: " + r.error);
+      btn.disabled = false; btn.textContent = orig;
+      return;
+    }
+    ALL_STUDENTS = r.students || [];
+    document.getElementById("gateBox").style.display = "none";
+    document.getElementById("dashSection").classList.add("show");
+    renderStats();
+    renderRanking();
+    renderTopicChart();
+  }catch(e){
+    msg.className = "gate-msg err show";
+    msg.textContent = "⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูลได้ในขณะนี้ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่";
+  }
+  btn.disabled = false; btn.textContent = orig;
+}
+
+function renderStats(){
+  const total = ALL_STUDENTS.length;
+  const withData = ALL_STUDENTS.filter(s=>s.riskScore!==null);
+  const avgRisk = withData.length ? Math.round(withData.reduce((a,s)=>a+s.riskScore,0)/withData.length) : null;
+  const seriousCount = ALL_STUDENTS.filter(s=>s.riskLevel==="serious").length;
+  const warningCount = ALL_STUDENTS.filter(s=>s.riskLevel==="warning").length;
+  const doneAll3 = ALL_STUDENTS.filter(s=>s.completions && s.completions.length===3).length;
+
+  const el = document.getElementById("statRow");
+  el.innerHTML = `
+    <div class="stat-tile"><div class="val">${total}</div><div class="lbl">นักศึกษาทั้งหมดในระบบ</div></div>
+    <div class="stat-tile"><div class="val">${avgRisk===null?"-":avgRisk}</div><div class="lbl">ดัชนีความเสี่ยงเฉลี่ย (0–100)</div></div>
+    <div class="stat-tile status-serious"><div class="val"><span class="icon">🔴</span> ${seriousCount}</div><div class="lbl">ควรได้รับความช่วยเหลือเพิ่มเติม</div></div>
+    <div class="stat-tile status-warning"><div class="val"><span class="icon">🟡</span> ${warningCount}</div><div class="lbl">ควรทบทวนเพิ่มเติม</div></div>
+    <div class="stat-tile status-good"><div class="val"><span class="icon">✅</span> ${doneAll3}</div><div class="lbl">ทำครบทั้ง 3 ครั้งแล้ว</div></div>
+  `;
+}
+
+function filteredStudents(){
+  const level = document.getElementById("filterLevel").value;
+  const q = document.getElementById("searchBox").value.trim().toLowerCase();
+  return ALL_STUDENTS.filter(s=>{
+    if(level !== "all" && s.riskLevel !== level) return false;
+    if(q && !((s.name||"").toLowerCase().includes(q) || (s.sid||"").toLowerCase().includes(q))) return false;
+    return true;
+  }).sort((a,b)=>(b.riskScore ?? -1) - (a.riskScore ?? -1));
+}
+
+function renderRanking(){
+  const list = filteredStudents();
+  const el = document.getElementById("rankingList");
+  if(list.length===0){
+    el.innerHTML = `<div class="empty-note">ไม่พบข้อมูลนักศึกษาตามเงื่อนไขที่เลือก</div>`;
+  } else {
+    el.innerHTML = list.map((s,i)=>{
+      const meta = STATUS_META[s.riskLevel] || STATUS_META.no_data;
+      const pct = s.riskScore===null ? 0 : s.riskScore;
+      const rowId = "row-"+i;
+      return `
+      <div class="bar-row" data-row="${rowId}">
+        <span class="bar-status-icon">${meta.icon}</span>
+        <span class="label">${s.name || "(ไม่ระบุชื่อ)"}<span class="sub">${s.sid}</span></span>
+        <div class="bar-track" title="${meta.label}${s.riskScore===null?"":" — ดัชนี "+s.riskScore+"/100"}">
+          <div class="bar-fill${textureOn?" textured":""}" style="width:${pct}%;background:${meta.color}"></div>
+        </div>
+        <span class="bar-value">${s.riskScore===null?"-":s.riskScore}</span>
+      </div>
+      <div class="detail-panel" id="${rowId}">
+        ${detailHtml(s)}
+      </div>`;
+    }).join("");
+    el.querySelectorAll(".bar-row").forEach(row=>{
+      row.addEventListener("click", ()=>{
+        const panel = document.getElementById(row.dataset.row);
+        panel.classList.toggle("show");
+      });
+    });
+  }
+  renderTable(list);
+}
+
+function detailHtml(s){
+  const parts = [];
+  parts.push(`<div class="weak-item"><span>อีเมล</span><span>${s.email || "-"}</span></div>`);
+  parts.push(`<div class="weak-item"><span>ตอบถูกในความพยายามครั้งแรก</span><span>${s.firstAttemptAccuracy!==null?Math.round(s.firstAttemptAccuracy*100)+"%":"-"}</span></div>`);
+  parts.push(`<div class="weak-item"><span>จำนวนครั้งที่ลองเฉลี่ย/ข้อ</span><span>${s.avgAttempts ?? "-"}</span></div>`);
+  parts.push(`<div class="weak-item"><span>เช็คชื่อแล้ว</span><span>${(s.checkins||[]).join(", ") || "-"}</span></div>`);
+  parts.push(`<div class="weak-item"><span>ทำครบแล้ว</span><span>${(s.completions||[]).join(", ") || "-"}</span></div>`);
+  if(s.weakTopics && s.weakTopics.length){
+    parts.push(`<div style="margin-top:8px;font-weight:700;">📌 หัวข้อที่ควรทบทวน:</div>`);
+    s.weakTopics.forEach(t=>{
+      parts.push(`<div class="weak-item"><span>${t.topic}</span><span>ผิด ${t.wrongCount}/${t.totalCount} (${Math.round(t.wrongRate*100)}%)</span></div>`);
+    });
+  }
+  return parts.join("");
+}
+
+function toggleTable(){
+  const listView = document.getElementById("rankingList");
+  const tableView = document.getElementById("tableView");
+  const showingTable = tableView.style.display !== "none";
+  tableView.style.display = showingTable ? "none" : "block";
+  listView.style.display = showingTable ? "block" : "none";
+  document.querySelector(".legend").style.display = showingTable ? "flex" : "none";
+}
+
+function renderTable(list){
+  const el = document.getElementById("dataTable");
+  const head = `<tr><th>รหัสนักศึกษา</th><th>ชื่อ</th><th>ระดับ</th><th>ดัชนีความเสี่ยง</th><th>ตอบถูกครั้งแรก</th><th>ลองเฉลี่ย/ข้อ</th><th>ครั้งที่ทำครบ</th><th>หัวข้อที่ควรทบทวน</th></tr>`;
+  const rows = list.map(s=>{
+    const meta = STATUS_META[s.riskLevel] || STATUS_META.no_data;
+    return `<tr>
+      <td>${s.sid}</td>
+      <td>${s.name || "-"}</td>
+      <td>${meta.icon} ${meta.label}</td>
+      <td class="num">${s.riskScore===null?"-":s.riskScore}</td>
+      <td class="num">${s.firstAttemptAccuracy!==null?Math.round(s.firstAttemptAccuracy*100)+"%":"-"}</td>
+      <td class="num">${s.avgAttempts ?? "-"}</td>
+      <td class="num">${(s.completions||[]).length}/3</td>
+      <td>${(s.weakTopics||[]).map(t=>t.topic).join(", ") || "-"}</td>
+    </tr>`;
+  }).join("");
+  el.innerHTML = head + rows;
+}
+
+function renderTopicChart(){
+  const agg = {}; // topic -> {wrong, total, students:Set}
+  ALL_STUDENTS.forEach(s=>{
+    (s.weakTopics||[]).forEach(t=>{
+      if(!agg[t.topic]) agg[t.topic] = {wrong:0, total:0, students:0};
+      agg[t.topic].wrong += t.wrongCount;
+      agg[t.topic].total += t.totalCount;
+      agg[t.topic].students += 1;
+    });
+  });
+  const topics = Object.keys(agg).map(t=>({topic:t, ...agg[t]})).sort((a,b)=>b.wrong-a.wrong).slice(0,10);
+  const el = document.getElementById("topicChart");
+  if(topics.length===0){
+    el.innerHTML = `<div class="empty-note">ยังไม่มีข้อมูลเพียงพอ — จะแสดงผลเมื่อมีนักศึกษาทำแบบฝึกหัดและมีคำตอบผิดในความพยายามครั้งแรก</div>`;
+    return;
+  }
+  const maxWrong = Math.max(...topics.map(t=>t.wrong));
+  el.innerHTML = topics.map(t=>{
+    const pct = Math.round((t.wrong/maxWrong)*100);
+    return `
+    <div class="bar-row" style="cursor:default;">
+      <span class="label" style="width:260px;" title="${t.topic}">${t.topic}</span>
+      <div class="bar-track" title="ตอบผิดครั้งแรก ${t.wrong} ครั้ง จาก ${t.students} คน">
+        <div class="bar-fill${textureOn?" textured":""}" style="width:${pct}%;background:var(--seq-400)"></div>
+      </div>
+      <span class="bar-value">${t.wrong}</span>
+    </div>`;
+  }).join("");
+}
+</script>
+</body>
+</html>
