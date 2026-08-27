@@ -310,6 +310,7 @@ const MODULES = [
     icon:"🧬",
     cardDesc:"หลักการถ่ายทอดลักษณะทางพันธุกรรม, Punnett Square, หมู่เลือด ABO, พันธุกรรมเชื่อมโยงเพศ",
     video:"https://youtu.be/Yvaho4IhdbM",
+    pdf:"https://drive.google.com/file/d/1qoG8iAvqMeA3D83ijl2v4knbYBos5ea4/view?usp=share_link",
     form:"https://forms.gle/7wYnFG1kVxeLhK3r5",
     prepost:[
       {q:"ข้อใดคือ \"องค์ประกอบทางพันธุกรรม\" ของสิ่งมีชีวิต ที่เขียนแทนด้วยสัญลักษณ์ตัวอักษร เช่น Tt หรือ tt?",
@@ -400,6 +401,7 @@ const MODULES = [
     icon:"🧫",
     cardDesc:"โครงสร้างโครโมโซม, การเปลี่ยนแปลงโครงสร้าง, พลอยดีและพืชโพลีพลอยด์",
     video:"https://youtu.be/oUSvhEp5nbo",
+    pdf:"https://drive.google.com/file/d/1JWB5sXpFiiBYSLMC5wIMehI6Em5v6t1U/view?usp=share_link",
     form:"https://forms.gle/7wYnFG1kVxeLhK3r5",
     prepost:[
       {q:"โครงสร้างส่วนใดของโครโมโซมทำหน้าที่ปกป้องปลายโครโมโซมไม่ให้เสื่อมสภาพ?",
@@ -486,6 +488,7 @@ const MODULES = [
     icon:"🧪",
     cardDesc:"ชนิดของมิวเทชัน สารก่อกลายพันธุ์ กลไกซ่อมแซม DNA และการรีคอมบิเนชัน (คะแนนสัดส่วนสูงสุด 10 คะแนน)",
     video:"https://youtu.be/6rp9xgy9vzA",
+    pdf:"https://drive.google.com/file/d/11HL-Wo0459IlVxOPEEJMhC-2DQ9UuBbI/view?usp=share_link",
     form:"https://forms.gle/7wYnFG1kVxeLhK3r5",
     prepost:[
       {q:"สารเคมีหรือรังสีที่ทำให้อัตราการเกิดมิวเทชันเพิ่มสูงขึ้น เรียกว่าอะไร?",
@@ -984,10 +987,11 @@ function renderModule(mod){
       <p class="meta">${mod.subtitle} · แบบฝึกหัดทั้งหมด ${total} ข้อ</p>
       <div class="module-progress">
         <div class="mini-bar" style="height:9px;"><div class="mini-bar-fill" id="modbar-${mod.id}" style="width:0%;background:${mod.color};height:9px;"></div></div>
-        <p style="font-size:.82rem;color:var(--muted);margin:6px 0 0;" id="modlabel-${mod.id}">ทำถูกแล้ว 0 / ${total} ข้อ</p>
+        <p style="font-size:.82rem;color:var(--muted);margin:6px 0 0;" id="modlabel-${mod.id}">ทำแล้ว 0 / ${total} ข้อ</p>
       </div>
       <div class="link-row">
         <a class="link-btn" href="${mod.video}" target="_blank" rel="noopener">▶ วิดีโอทบทวนก่อนเรียน</a>
+        <a class="link-btn" href="${mod.pdf}" target="_blank" rel="noopener">📄 เอกสารประกอบการสอน (PDF)</a>
       </div>
       ${banner}
     </div>
