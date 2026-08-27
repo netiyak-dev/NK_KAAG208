@@ -339,7 +339,7 @@ const MODULES = [
         "<b>Heterozygous (เฮเทอโรไซกัส)</b> — แอลลีลคู่ต่างกัน เช่น Tt"
       ], note:"💡 <b>เทคนิคจำง่าย:</b> ให้นึกว่า Gene คือ \"ตำแหน่งงาน\" ส่วน Allele คือ \"ผู้สมัครแต่ละคน\" ที่มาแข่งกันในตำแหน่งนั้น — Genotype คือรายชื่อผู้ได้รับเลือกทั้งคู่ ส่วน Phenotype คือสิ่งที่ทุกคนมองเห็นเป็นผลลัพธ์"},
       {type:"quiz", id:"m1e1", tag:"แบบฝึกหัดที่ 1", topic:"คำศัพท์พื้นฐานที่ต้องรู้ก่อน", q:"สิ่งมีชีวิตที่มีจีโนไทป์ \"Aa\" เรียกว่าลักษณะใด?",
-        choices:["Homozygous dominant (AA)","Homozygous recessive (aa)","Heterozygous (แอลลีลต่างกัน)","Phenotype เด่น"],
+        choices:["Homozygous dominant","Homozygous recessive","Heterozygous","Phenotype เด่น"],
         correct:2, explain:"Aa มีแอลลีลสองตัวที่ต่างกัน (A กับ a) จึงเรียกว่า Heterozygous ส่วน Homozygous ต้องเป็นแอลลีลคู่เหมือนกันเท่านั้น เช่น AA หรือ aa"},
       {type:"text", heading:"3) กฎการแยกตัว (Law of Segregation) และ Punnett Square", body:[
         "กฎข้อที่ 1 ของเมนเดล กล่าวว่า แอลลีลที่เป็นคู่กันจะแยกออกจากกันตอนสร้างเซลล์สืบพันธุ์ (gamete) ทำให้เซลล์สืบพันธุ์แต่ละเซลล์มีแอลลีลเพียงตัวเดียวจากคู่นั้น",
@@ -554,36 +554,21 @@ const MODULES = [
 ];
 
 /* ================= BACKEND CONFIG =================
-   วางลิงก์ Web App ที่ได้จากการ Deploy Google Apps Script (ลงท้ายด้วย /exec) ไว้ระหว่างเครื่องหมายคำพูดด้านล่าง
+   วางลิงก์ Cloudflare Worker (proxy ไปยัง Google Apps Script) ไว้ระหว่างเครื่องหมายคำพูดด้านล่าง
    ดูขั้นตอนการติดตั้งได้ในไฟล์คู่มือที่แนบมาพร้อมกัน (KAAG208_คู่มือติดตั้งฐานข้อมูล.md)
+   เหตุผลที่ต้องผ่าน Worker แทนเรียก Apps Script ตรง ๆ: เบราว์เซอร์บล็อกการเรียก Apps Script
+   ข้ามโดเมนโดยตรงเสมอ (CORS/ORB) แม้ฝั่งเซิร์ฟเวอร์จะทำงานถูกต้องก็ตาม — Worker รันฝั่งเซิร์ฟเวอร์
+   จึงเรียก Apps Script แทนเว็บได้ แล้วส่งผลลัพธ์กลับมาพร้อม header ที่ถูกต้อง
    ถ้าปล่อยว่างไว้ เว็บจะทำงานในโหมดออฟไลน์ (เก็บข้อมูลในเบราว์เซอร์ชั่วคราวเท่านั้น ไม่ตรวจสอบข้ามอุปกรณ์) */
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFGV_6cE6lVMdTywpTDUoqpbRB3t4xxvjALWQEwF90mXUadpp-Rlk-CuLYUW44rv0GfQ/exec";
+const APPS_SCRIPT_URL = "https://kaag208-proxy.netiya-karaket.workers.dev";
 
 function apiEnabled(){ return !!APPS_SCRIPT_URL; }
 
-/* เรียก Apps Script ผ่านแท็ก <script> (JSONP) แทน fetch() ตรง ๆ
- * เพราะ fetch() ข้ามโดเมนไปยัง Apps Script /exec มักโดน CORS/redirect บล็อกจากฝั่งเบราว์เซอร์
- * แม้ฝั่งเซิร์ฟเวอร์จะรันสำเร็จก็ตาม — <script> tag ไม่ถูกจำกัดด้วย CORS แบบเดียวกับ fetch/XHR */
-let _jsonpCounter = 0;
-function apiCall(params){
-  return new Promise((resolve, reject)=>{
-    const cbName = "__kaag208_cb_" + (_jsonpCounter++) + "_" + Date.now();
-    const timeoutId = setTimeout(()=>{ cleanup(); reject(new Error("หมดเวลาเชื่อมต่อฐานข้อมูล")); }, 15000);
-
-    function cleanup(){
-      clearTimeout(timeoutId);
-      delete window[cbName];
-      if(script.parentNode) script.parentNode.removeChild(script);
-    }
-
-    window[cbName] = (data)=>{ cleanup(); resolve(data); };
-
-    const url = APPS_SCRIPT_URL + "?" + new URLSearchParams(Object.assign({}, params, {callback:cbName})).toString();
-    const script = document.createElement("script");
-    script.src = url;
-    script.onerror = ()=>{ cleanup(); reject(new Error("โหลดข้อมูลจากฐานข้อมูลไม่สำเร็จ")); };
-    document.head.appendChild(script);
-  });
+async function apiCall(params){
+  const url = APPS_SCRIPT_URL + "?" + new URLSearchParams(params).toString();
+  const res = await fetch(url, { method:"GET" });
+  if(!res.ok) throw new Error("HTTP " + res.status);
+  return res.json();
 }
 async function apiCheckin(sid, email, name, session){
   return apiCall({action:"checkin", sid, email, name, session});
@@ -631,17 +616,17 @@ let currentPage = "home";
 function totalQuizCount(){
   return MODULES.reduce((sum,m)=>sum+m.sections.filter(s=>s.type==="quiz").length,0);
 }
-function correctCount(moduleId){
+function answeredCount(moduleId){
   const mod = MODULES.find(m=>m.id===moduleId);
-  return mod.sections.filter(s=>s.type==="quiz" && state[s.id] && state[s.id].correct).length;
+  return mod.sections.filter(s=>s.type==="quiz" && state[s.id] && state[s.id].answered).length;
 }
-function totalCorrect(){
-  return MODULES.reduce((sum,m)=>sum+correctCount(m.id),0);
+function totalAnswered(){
+  return MODULES.reduce((sum,m)=>sum+answeredCount(m.id),0);
 }
 function isModuleComplete(modId){
   const mod = MODULES.find(m=>m.id===modId);
   const total = mod.sections.filter(s=>s.type==="quiz").length;
-  return correctCount(modId) === total;
+  return answeredCount(modId) === total;
 }
 function allModulesComplete(){
   return MODULES.every(m=>isModuleComplete(m.id));
@@ -649,7 +634,7 @@ function allModulesComplete(){
 function moduleStatusListHtml(){
   return MODULES.map(m=>{
     const total = m.sections.filter(s=>s.type==="quiz").length;
-    const done = correctCount(m.id);
+    const done = answeredCount(m.id);
     const ok = done===total;
     const checked = !!state.checkins[m.id];
     return `<li>${ok?"✅":"🔒"} ครั้งที่ ${m.badge} (${m.title}): ${done}/${total} ข้อ${checked?"":" · ยังไม่เช็คชื่อเข้าเรียน"}</li>`;
@@ -682,7 +667,7 @@ function renderHome(){
   const el = document.getElementById("page-home");
   const cards = MODULES.map(m=>{
     const total = m.sections.filter(s=>s.type==="quiz").length;
-    const done = correctCount(m.id);
+    const done = answeredCount(m.id);
     const pct = Math.round(done/total*100);
     const checkin = state.checkins[m.id];
     const attendanceLine = checkin
@@ -706,7 +691,7 @@ function renderHome(){
       <h2>ยินดีต้อนรับสู่บทเรียนออนไลน์ 🌾</h2>
       <p>เว็บนี้รวบรวมเนื้อหาสรุปจากสไลด์ประกอบการสอนรายวิชา KAAG208 & 304: Genetics for Agriculture ทั้ง 3 หัวข้อ พร้อมแบบฝึกหัดสั้น ๆ แทรกไว้ในจุดสำคัญของแต่ละครั้งเรียน เพื่อให้ทบทวนและเช็คความเข้าใจได้ทันที</p>
       <div class="how-to">
-        <b>วิธีใช้งาน:</b> เลือกหัวข้อที่ต้องการ (ครั้งที่ 1–3 ตามลำดับ) → เช็คชื่อเข้าเรียน (ยืนยันตัวตน) ด้วยชื่อ รหัสนักศึกษา และอีเมล ก่อนเริ่มเนื้อหาแต่ละครั้ง (ระบบจะตรวจว่าทำครั้งก่อนหน้าครบแล้วหรือยัง ถ้ายังจะให้ไปทำครั้งก่อนหน้าก่อน) → ทำ <b>แบบทดสอบก่อนเรียน</b> สั้น ๆ → อ่านเนื้อหาและทำแบบฝึกหัดที่แทรกอยู่ระหว่างเนื้อหา → ทำ <b>แบบทดสอบหลังเรียน</b> เพื่อทบทวนอีกครั้ง (แบบทดสอบก่อน/หลังเรียนไม่นับคะแนนและไม่มีผลต่อการปลดล็อก) → เมื่อทำแบบฝึกหัดถูกครบทุกข้อในครั้งที่ 1–3 แล้ว ไปที่แท็บ <b>"📝 แบบทดสอบจริง"</b> เพื่อกรอกรหัสนักศึกษาตรวจสอบสิทธิ์และเข้าทำแบบทดสอบเก็บคะแนนจริง (เปิดให้ทำเฉพาะวันที่ 26 กันยายน 2569 เวลา 10:30–12:30 น.)
+        <b>วิธีใช้งาน:</b> เลือกหัวข้อที่ต้องการ (ครั้งที่ 1–3 ตามลำดับ) → เช็คชื่อเข้าเรียน (ยืนยันตัวตน) ด้วยชื่อ รหัสนักศึกษา และอีเมล ก่อนเริ่มเนื้อหาแต่ละครั้ง (ระบบจะตรวจว่าทำครั้งก่อนหน้าครบแล้วหรือยัง ถ้ายังจะให้ไปทำครั้งก่อนหน้าก่อน) → ทำ <b>แบบทดสอบก่อนเรียน</b> สั้น ๆ → อ่านเนื้อหาและทำแบบฝึกหัดที่แทรกอยู่ระหว่างเนื้อหา → ทำ <b>แบบทดสอบหลังเรียน</b> เพื่อทบทวนอีกครั้ง (แบบทดสอบก่อน/หลังเรียนไม่นับคะแนนและไม่มีผลต่อการปลดล็อก) → เมื่อทำแบบฝึกหัดครบทุกข้อในครั้งที่ 1–3 แล้ว ไปที่แท็บ <b>"📝 แบบทดสอบจริง"</b> เพื่อกรอกรหัสนักศึกษาตรวจสอบสิทธิ์และเข้าทำแบบทดสอบเก็บคะแนนจริง (เปิดให้ทำเฉพาะวันที่ 26 กันยายน 2569 เวลา 10:30–12:30 น.)
       </div>
     </div>
     <div class="module-grid">${cards}</div>
@@ -755,8 +740,8 @@ function renderPrePostBlock(mod, phase){
   const label = phase === "pre" ? "แบบทดสอบก่อนเรียน" : "แบบทดสอบหลังเรียน";
   const tagClass = phase === "pre" ? "pretest" : "posttest";
   const desc = phase === "pre"
-    ? "ทำแบบทดสอบสั้น ๆ นี้ก่อนเริ่มอ่านเนื้อหา เพื่อประเมินความรู้พื้นฐานของตนเองก่อนเรียน (ระบบจะยังไม่เฉลยคำตอบตอนนี้ แต่จะเก็บข้อมูลไว้เทียบกับแบบทดสอบหลังเรียน — ไม่นับคะแนนและไม่มีผลต่อการปลดล็อกใด ๆ)"
-    : "ทำแบบทดสอบชุดเดิมอีกครั้งหลังเรียนจบ เพื่อเช็คว่าความเข้าใจดีขึ้นหรือไม่ (ไม่นับคะแนนและไม่มีผลต่อการปลดล็อกใด ๆ)";
+    ? "ทำแบบทดสอบสั้น ๆ นี้ก่อนเริ่มอ่านเนื้อหา เพื่อประเมินความรู้พื้นฐานของตนเองก่อนเรียน (ระบบจะยังไม่เฉลยคำตอบ แต่จะเก็บข้อมูลไว้เทียบกับแบบทดสอบหลังเรียน — ไม่นับคะแนนและไม่มีผลต่อการปลดล็อกใด ๆ กดส่งคำตอบได้ครั้งเดียว)"
+    : "ทำแบบทดสอบชุดเดิมอีกครั้งหลังเรียนจบ เพื่อเช็คว่าความเข้าใจดีขึ้นหรือไม่ (ไม่นับคะแนนและไม่มีผลต่อการปลดล็อกใด ๆ กดส่งคำตอบได้ครั้งเดียว)";
   const items = mod.prepost.map((q,i)=>{
     const id = `${mod.id}-${phase}-${i}`;
     const choiceHtml = q.choices.map((c,ci)=>`
@@ -768,10 +753,6 @@ function renderPrePostBlock(mod, phase){
       <div class="quiz-item" id="qb-${id}" style="margin-bottom:14px;">
         <p class="quiz-q">${i+1}. ${q.q}</p>
         <div class="choices">${choiceHtml}</div>
-        <div class="quiz-actions">
-          <button class="btn" id="submit-${id}">ตรวจคำตอบ</button>
-          <button class="btn secondary" id="retry-${id}" style="display:none">ลองใหม่</button>
-        </div>
         <div class="feedback" id="fb-${id}"></div>
       </div>`;
   }).join("");
@@ -779,6 +760,10 @@ function renderPrePostBlock(mod, phase){
     <span class="quiz-tag ${tagClass}">${label}</span>
     <p style="font-size:.88rem;color:var(--muted);margin:0 0 12px;">${desc}</p>
     ${items}
+    <div class="quiz-actions">
+      <button class="btn" id="submit-${mod.id}-${phase}">ส่งคำตอบ</button>
+    </div>
+    <div class="feedback" id="fb-${mod.id}-${phase}-summary"></div>
   </div>`;
 }
 
@@ -786,55 +771,49 @@ function bindPrePostBlock(mod, phase){
   state.prepost[mod.id] = state.prepost[mod.id] || {};
   state.prepost[mod.id][phase] = new Array(mod.prepost.length).fill(null);
 
-  mod.prepost.forEach((q,i)=>{
-    const id = `${mod.id}-${phase}-${i}`;
-    const box = document.getElementById("qb-"+id);
-    const submitBtn = document.getElementById("submit-"+id);
-    const retryBtn = document.getElementById("retry-"+id);
-    const fb = document.getElementById("fb-"+id);
+  const submitBtn = document.getElementById(`submit-${mod.id}-${phase}`);
+  const summaryFb = document.getElementById(`fb-${mod.id}-${phase}-summary`);
 
-    submitBtn.addEventListener("click", ()=>{
+  submitBtn.addEventListener("click", ()=>{
+    const answers = [];
+    for(let i=0;i<mod.prepost.length;i++){
+      const id = `${mod.id}-${phase}-${i}`;
+      const box = document.getElementById("qb-"+id);
       const checked = box.querySelector(`input[name="${id}"]:checked`);
       if(!checked){
-        fb.className = "feedback err";
-        fb.innerHTML = "<b>โปรดเลือกคำตอบก่อนตรวจ</b>";
+        summaryFb.className = "feedback err";
+        summaryFb.innerHTML = "<b>โปรดเลือกคำตอบให้ครบทุกข้อก่อนส่ง</b>";
         return;
       }
-      const chosen = parseInt(checked.value,10);
-      const isCorrect = chosen === q.correct;
+      answers.push(parseInt(checked.value,10));
+    }
+
+    mod.prepost.forEach((q,i)=>{
+      const id = `${mod.id}-${phase}-${i}`;
+      const box = document.getElementById("qb-"+id);
+      const fb = document.getElementById("fb-"+id);
+      const isCorrect = answers[i] === q.correct;
+      box.querySelectorAll("input").forEach(inp=>inp.disabled=true);
 
       if(phase === "pre"){
-        // แบบทดสอบก่อนเรียน: ไม่เฉลยคำตอบ แค่บันทึกไว้เทียบกับหลังเรียน
         fb.className = "feedback ok";
-        fb.innerHTML = "<b>✅ บันทึกคำตอบแล้ว</b>ระบบจะยังไม่เฉลยข้อนี้ตอนนี้ — จะให้เทียบผลกับแบบทดสอบหลังเรียนเมื่อเรียนจบ";
-        submitBtn.style.display = "none";
-        box.querySelectorAll("input").forEach(inp=>inp.disabled=true);
+        fb.innerHTML = "<b>บันทึกคำตอบแล้ว</b>";
       } else {
-        box.querySelectorAll(".choice").forEach(ch=>{
-          const ci = parseInt(ch.dataset.idx,10);
-          ch.classList.remove("correct","wrong");
-          if(ci===q.correct) ch.classList.add("correct");
-          else if(ci===chosen && !isCorrect) ch.classList.add("wrong");
-        });
         fb.className = "feedback " + (isCorrect ? "ok" : "err");
-        fb.innerHTML = `<b>${isCorrect ? "✅ ถูกต้อง!" : "❌ ยังไม่ถูก"}</b>${q.explain}`;
-        submitBtn.style.display = "none";
-        retryBtn.style.display = "inline-block";
-        box.querySelectorAll("input").forEach(inp=>inp.disabled=true);
+        fb.innerHTML = `<b>${isCorrect ? "✅ ถูกต้อง" : "❌ ยังไม่ถูก"}</b>`;
       }
 
       state.prepost[mod.id][phase][i] = isCorrect;
-      maybeLogPrePost(mod, phase);
     });
 
-    retryBtn.addEventListener("click", ()=>{
-      box.querySelectorAll(".choice").forEach(ch=>ch.classList.remove("correct","wrong"));
-      box.querySelectorAll("input").forEach(inp=>{inp.disabled=false; inp.checked=false;});
-      fb.className = "feedback";
-      fb.innerHTML = "";
-      submitBtn.style.display = "inline-block";
-      retryBtn.style.display = "none";
-    });
+    submitBtn.disabled = true;
+    submitBtn.textContent = "ส่งคำตอบแล้ว";
+    summaryFb.className = "feedback ok";
+    summaryFb.innerHTML = phase === "pre"
+      ? "✅ บันทึกคำตอบครบทุกข้อแล้ว ระบบจะยังไม่เฉลยตอนนี้ — จะเทียบผลกับแบบทดสอบหลังเรียนเมื่อเรียนจบ"
+      : "✅ ส่งคำตอบครบทุกข้อแล้ว";
+
+    maybeLogPrePost(mod, phase);
   });
 }
 
@@ -862,7 +841,7 @@ function checkinTemplate(mod){
   const idx = MODULES.findIndex(m=>m.id===mod.id);
   const prereq = idx>0 ? MODULES[idx-1] : null;
   const prereqNote = prereq
-    ? `<div class="checkin-note">🔒 ครั้งนี้ต้องทำแบบฝึกหัดในครั้งที่ ${prereq.badge} ให้ถูกครบก่อน ระบบจะตรวจสอบจากฐานข้อมูลให้อัตโนมัติเมื่อกดเช็คชื่อ</div>`
+    ? `<div class="checkin-note">🔒 ครั้งนี้ต้องทำแบบฝึกหัดในครั้งที่ ${prereq.badge} ให้ครบก่อน ระบบจะตรวจสอบจากฐานข้อมูลให้อัตโนมัติเมื่อกดเช็คชื่อ</div>`
     : "";
   return `
     <div class="module-header">
@@ -929,7 +908,7 @@ async function bindCheckin(mod){
           const done = status.ok && status.completions && status.completions.includes(prereq.badge);
           if(!done){
             blockEl.classList.add("show");
-            blockEl.innerHTML = `🔒 รหัสนักศึกษา <b>${sid}</b> ยังไม่พบข้อมูลว่าทำแบบฝึกหัดครั้งที่ ${prereq.badge} ครบถูกต้องในฐานข้อมูล กรุณาไปทำครั้งที่ ${prereq.badge} ให้เสร็จก่อน<br>
+            blockEl.innerHTML = `🔒 รหัสนักศึกษา <b>${sid}</b> ยังไม่พบข้อมูลว่าทำแบบฝึกหัดครั้งที่ ${prereq.badge} ครบในฐานข้อมูล กรุณาไปทำครั้งที่ ${prereq.badge} ให้เสร็จก่อน<br>
               <button class="btn" id="ci-goto-${mod.id}">ไปครั้งที่ ${prereq.badge} &rarr;</button>`;
             document.getElementById("ci-goto-"+mod.id).addEventListener("click", ()=>showPage(prereq.id));
             btn.disabled = false;
@@ -975,7 +954,7 @@ function renderModule(mod){
     <div class="end-summary">
       <h3>จบเนื้อหาครั้งที่ ${mod.badge} แล้ว! 🎉</h3>
       <div class="end-score" id="endscore-${mod.id}">0 / ${total}</div>
-      <p style="margin:0 0 14px;opacity:.9;">คะแนนแบบฝึกหัดทบทวนของครั้งนี้ — ทำแบบฝึกหัดให้ถูกครบทุกข้อ ระบบจะบันทึกความคืบหน้าลงฐานข้อมูลให้อัตโนมัติ</p>
+      <p style="margin:0 0 14px;opacity:.9;">คะแนนแบบฝึกหัดทบทวนของครั้งนี้ — ทำแบบฝึกหัดให้ครบทุกข้อ ระบบจะบันทึกความคืบหน้าลงฐานข้อมูลให้อัตโนมัติ</p>
       ${nextMod ? `<button class="next-btn" id="gonext-${mod.id}">ไปครั้งที่ ${nextMod.badge}: ${nextMod.title} →</button>` : `<button class="next-btn" id="gonext-${mod.id}">ไปหน้าแบบทดสอบจริง →</button>`}
     </div>`;
 
@@ -1029,14 +1008,11 @@ function bindQuiz(sec, mod){
     }
     const chosen = parseInt(checked.value,10);
     const isCorrect = chosen === sec.correct;
-    box.querySelectorAll(".choice").forEach(ch=>{
-      const i = parseInt(ch.dataset.idx,10);
-      ch.classList.remove("correct","wrong");
-      if(i===sec.correct) ch.classList.add("correct");
-      else if(i===chosen && !isCorrect) ch.classList.add("wrong");
-    });
+
     fb.className = "feedback " + (isCorrect ? "ok" : "err");
-    fb.innerHTML = `<b>${isCorrect ? "✅ ถูกต้อง!" : "❌ ยังไม่ถูก"}</b>${sec.explain}`;
+    fb.innerHTML = isCorrect
+      ? "<b>✅ ถูกต้อง!</b>"
+      : `<b>❌ ยังไม่ถูก</b>ลองไปทบทวนหัวข้อ "${sec.topic || ""}" เพิ่มเติมดูนะ`;
 
     state[sec.id] = {answered:true, correct:isCorrect};
     submitBtn.style.display = "none";
@@ -1051,7 +1027,6 @@ function bindQuiz(sec, mod){
   });
 
   retryBtn.addEventListener("click", ()=>{
-    box.querySelectorAll(".choice").forEach(ch=>ch.classList.remove("correct","wrong"));
     box.querySelectorAll("input").forEach(i=>{i.disabled=false; i.checked=false;});
     fb.className = "feedback";
     fb.innerHTML = "";
@@ -1063,20 +1038,20 @@ function bindQuiz(sec, mod){
 function updateModuleProgress(modId){
   const mod = MODULES.find(m=>m.id===modId);
   const total = mod.sections.filter(s=>s.type==="quiz").length;
-  const done = correctCount(modId);
+  const done = answeredCount(modId);
   const pct = Math.round(done/total*100);
   const bar = document.getElementById("modbar-"+modId);
   const label = document.getElementById("modlabel-"+modId);
   const end = document.getElementById("endscore-"+modId);
   if(bar) bar.style.width = pct+"%";
-  if(label) label.textContent = `ทำถูกแล้ว ${done} / ${total} ข้อ`;
+  if(label) label.textContent = `ทำแล้ว ${done} / ${total} ข้อ`;
   if(end) end.textContent = `${done} / ${total}`;
 }
 
 function updateHomeCard(modId){
   const mod = MODULES.find(m=>m.id===modId);
   const total = mod.sections.filter(s=>s.type==="quiz").length;
-  const done = correctCount(modId);
+  const done = answeredCount(modId);
   const scoreEl = document.getElementById("cardscore-"+modId);
   if(scoreEl){
     scoreEl.textContent = `${done}/${total}`;
@@ -1087,7 +1062,7 @@ function updateHomeCard(modId){
 
 function updateOverall(){
   const total = totalQuizCount();
-  const done = totalCorrect();
+  const done = totalAnswered();
   const pct = Math.round(done/total*100);
   document.getElementById("overallBar").style.width = pct+"%";
   document.getElementById("overallLabel").textContent = `ทำแบบฝึกหัดแล้ว ${done} / ${total} ข้อ`;
@@ -1267,7 +1242,7 @@ function renderExamPage(){
   el.innerHTML = `
     <div class="exam-hero">
       <h2>📝 แบบทดสอบเก็บคะแนนจริง</h2>
-      <p>${scheduleNote} แบบทดสอบนี้เป็นคะแนนเก็บจริงของรายวิชา จะทำได้ก็ต่อเมื่อเรียนและทำแบบฝึกหัดถูกครบทุกข้อในครั้งที่ 1, 2 และ 3 แล้วเท่านั้น กรอกรหัสนักศึกษาด้านล่างเพื่อตรวจสอบสิทธิ์ จากนั้นให้เข้าลิงก์ Google Form เพื่อยืนยันตัวตนและทำแบบทดสอบ</p>
+      <p>${scheduleNote} แบบทดสอบนี้เป็นคะแนนเก็บจริงของรายวิชา จะทำได้ก็ต่อเมื่อเรียนและทำแบบฝึกหัดครบทุกข้อในครั้งที่ 1, 2 และ 3 แล้วเท่านั้น กรอกรหัสนักศึกษาด้านล่างเพื่อตรวจสอบสิทธิ์ จากนั้นให้เข้าลิงก์ Google Form เพื่อยืนยันตัวตนและทำแบบทดสอบ</p>
     </div>
     <div class="exam-gate">
       <div class="checkin-field">
@@ -1323,11 +1298,11 @@ function bindExamPage(){
       const missing = MODULES.filter(m=>!completions.includes(m.badge));
       if(missing.length === 0){
         resultEl.className = "exam-result unlocked show";
-        resultEl.innerHTML = `🔓 <b>ปลดล็อกแล้ว!</b> รหัสนักศึกษา ${sid} ทำแบบฝึกหัดถูกครบทุกข้อในครั้งที่ 1–3 เรียบร้อยแล้ว<br><br>
+        resultEl.innerHTML = `🔓 <b>ปลดล็อกแล้ว!</b> รหัสนักศึกษา ${sid} ทำแบบฝึกหัดครบทุกข้อในครั้งที่ 1–3 เรียบร้อยแล้ว<br><br>
           <a class="link-btn" href="${m3.form}" target="_blank" rel="noopener">ไปทำแบบทดสอบเก็บคะแนนจริง (Google Form) →</a>`;
       } else {
         resultEl.className = "exam-result locked show";
-        resultEl.innerHTML = `🔒 รหัสนักศึกษา ${sid} ยังทำไม่ครบ ต้องทำแบบฝึกหัดให้ถูกครบทุกข้อในครั้งต่อไปนี้ก่อน:
+        resultEl.innerHTML = `🔒 รหัสนักศึกษา ${sid} ยังทำไม่ครบ ต้องทำแบบฝึกหัดให้ครบทุกข้อในครั้งต่อไปนี้ก่อน:
           <ul>${missing.map(m=>`<li>❌ ครั้งที่ ${m.badge}: ${m.title}</li>`).join("")}</ul>`;
       }
     }catch(e){

@@ -136,7 +136,7 @@
 <main class="wrap">
   <div class="gate" id="gateBox">
     <h2 style="margin-bottom:8px;">🔑 เข้าสู่ระบบอาจารย์</h2>
-    <p>กรอกรหัสผ่านอาจารย์ (ตั้งค่าไว้ที่ตัวแปร <code>INSTRUCTOR_KEY</code> ใน Code.gs) เพื่อดูภาพรวมความเสี่ยงและคำแนะนำของนักศึกษาทุกคน — ข้อมูลนี้เป็นข้อมูลส่วนบุคคลของนักศึกษา กรุณาอย่าเผยแพร่ลิงก์หน้านี้หรือรหัสผ่านต่อสาธารณะ</p>
+    <p>กรอกรหัสผ่านอาจารย์ (ตั้งค่าไว้ที่ secret <code>INSTRUCTOR_PASSWORD</code> ใน Cloudflare Worker) เพื่อดูภาพรวมความเสี่ยงและคำแนะนำของนักศึกษาทุกคน — ข้อมูลนี้เป็นข้อมูลส่วนบุคคลของนักศึกษา กรุณาอย่าเผยแพร่ลิงก์หน้านี้หรือรหัสผ่านต่อสาธารณะ</p>
     <div class="gate-row">
       <input type="password" id="keyInput" placeholder="รหัสผ่านอาจารย์ (Instructor Key)">
       <button class="btn" id="loadBtn">โหลดข้อมูล</button>
@@ -185,6 +185,25 @@
       <div id="topicChart"></div>
     </div>
 
+    <div class="panel">
+      <h2>🗂️ ข้อมูลดิบ</h2>
+      <p class="sub">ดูข้อมูลดิบทั้งหมดที่บันทึกไว้ในฐานข้อมูล หรือดาวน์โหลดเป็นไฟล์ CSV เปิดใน Excel/Google Sheets ได้</p>
+      <div class="toolbar">
+        <select id="rawTableSelect">
+          <option value="log">การเช็คชื่อ/ทำครบ (log)</option>
+          <option value="prepost">แบบทดสอบก่อน/หลังเรียน (prepost)</option>
+          <option value="quiz">แบบฝึกหัดรายข้อ (quiz)</option>
+        </select>
+        <button class="btn secondary" id="rawLoadBtn">โหลดข้อมูล</button>
+        <input type="text" id="rawSearchBox" placeholder="ค้นหา (ทุกคอลัมน์)">
+        <span class="spacer"></span>
+        <button class="btn secondary" id="rawCsvBtn">⬇️ ดาวน์โหลดเป็น CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="rawDataTable"></table>
+      </div>
+    </div>
+
   </section>
 </main>
 
@@ -194,37 +213,22 @@
 
 <script>
 /* ================= CONFIG =================
-   วางลิงก์ Apps Script Web App เดียวกับที่ใช้ในเว็บบทเรียนออนไลน์ (ลงท้ายด้วย /exec) */
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFGV_6cE6lVMdTywpTDUoqpbRB3t4xxvjALWQEwF90mXUadpp-Rlk-CuLYUW44rv0GfQ/exec";
+   วางลิงก์ Cloudflare Worker (proxy) เดียวกับที่ใช้ในเว็บบทเรียนออนไลน์ */
+const APPS_SCRIPT_URL = "https://kaag208-proxy.netiya-karaket.workers.dev";
 
 function apiEnabled(){ return !!APPS_SCRIPT_URL; }
 
-/* เรียก Apps Script ผ่านแท็ก <script> (JSONP) แทน fetch() ตรง ๆ
- * เพราะ fetch() ข้ามโดเมนไปยัง Apps Script /exec มักโดน CORS/redirect บล็อกจากฝั่งเบราว์เซอร์
- * แม้ฝั่งเซิร์ฟเวอร์จะรันสำเร็จก็ตาม — <script> tag ไม่ถูกจำกัดด้วย CORS แบบเดียวกับ fetch/XHR */
-let _jsonpCounter = 0;
-function apiCall(params){
-  return new Promise((resolve, reject)=>{
-    const cbName = "__kaag208_cb_" + (_jsonpCounter++) + "_" + Date.now();
-    const timeoutId = setTimeout(()=>{ cleanup(); reject(new Error("หมดเวลาเชื่อมต่อฐานข้อมูล")); }, 15000);
-
-    function cleanup(){
-      clearTimeout(timeoutId);
-      delete window[cbName];
-      if(script.parentNode) script.parentNode.removeChild(script);
-    }
-
-    window[cbName] = (data)=>{ cleanup(); resolve(data); };
-
-    const url = APPS_SCRIPT_URL + "?" + new URLSearchParams(Object.assign({}, params, {callback:cbName})).toString();
-    const script = document.createElement("script");
-    script.src = url;
-    script.onerror = ()=>{ cleanup(); reject(new Error("โหลดข้อมูลจากฐานข้อมูลไม่สำเร็จ")); };
-    document.head.appendChild(script);
-  });
+async function apiCall(params){
+  const url = APPS_SCRIPT_URL + "?" + new URLSearchParams(params).toString();
+  const res = await fetch(url, { method:"GET" });
+  if(!res.ok) throw new Error("HTTP " + res.status);
+  return res.json();
 }
 async function apiRiskAll(key){
   return apiCall({action:"riskAll", key});
+}
+async function apiRawData(table, key){
+  return apiCall({action:"rawData", table, key});
 }
 
 const STATUS_META = {
@@ -236,6 +240,13 @@ const STATUS_META = {
 
 let ALL_STUDENTS = [];
 let textureOn = false;
+let INSTRUCTOR_KEY = "";
+let CURRENT_RAW = { columns: [], rows: [] };
+const RAW_LABELS = {
+  id:"#", ts:"เวลา", sid:"รหัสนักศึกษา", email:"อีเมล", name:"ชื่อ",
+  session:"ครั้งที่", event_type:"ประเภท", phase:"ช่วง", score:"คะแนน", total:"เต็ม",
+  topic:"หัวข้อ", quiz_id:"รหัสข้อ", attempt:"ครั้งที่ลอง", correct:"ถูก/ผิด", is_first_attempt:"ครั้งแรก?"
+};
 
 document.addEventListener("DOMContentLoaded", ()=>{
   const note = document.getElementById("dbConfigNote");
@@ -252,6 +263,12 @@ document.addEventListener("DOMContentLoaded", ()=>{
     textureOn = !textureOn;
     document.getElementById("textureToggle").style.outline = textureOn ? "2px solid var(--seq-500)" : "none";
     renderRanking();
+  });
+  document.getElementById("rawLoadBtn").addEventListener("click", loadRawData);
+  document.getElementById("rawSearchBox").addEventListener("input", ()=>renderRawTable(CURRENT_RAW.columns, CURRENT_RAW.rows));
+  document.getElementById("rawCsvBtn").addEventListener("click", ()=>{
+    const table = document.getElementById("rawTableSelect").value;
+    downloadCsv(`kaag208-${table}.csv`, toCsv(CURRENT_RAW.columns, filteredRawRows()));
   });
 });
 
@@ -280,11 +297,13 @@ async function loadData(){
       return;
     }
     ALL_STUDENTS = r.students || [];
+    INSTRUCTOR_KEY = key;
     document.getElementById("gateBox").style.display = "none";
     document.getElementById("dashSection").classList.add("show");
     renderStats();
     renderRanking();
     renderTopicChart();
+    loadRawData();
   }catch(e){
     msg.className = "gate-msg err show";
     msg.textContent = "⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูลได้ในขณะนี้ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่";
@@ -425,6 +444,68 @@ function renderTopicChart(){
       <span class="bar-value">${t.wrong}</span>
     </div>`;
   }).join("");
+}
+
+async function loadRawData(){
+  const table = document.getElementById("rawTableSelect").value;
+  const btn = document.getElementById("rawLoadBtn");
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = "กำลังโหลด...";
+  try{
+    const r = await apiRawData(table, INSTRUCTOR_KEY);
+    if(!r.ok){
+      document.getElementById("rawDataTable").innerHTML = `<tr><td>เกิดข้อผิดพลาด: ${r.error}</td></tr>`;
+      return;
+    }
+    CURRENT_RAW = { columns: r.columns, rows: r.rows };
+    renderRawTable(CURRENT_RAW.columns, CURRENT_RAW.rows);
+  }catch(e){
+    document.getElementById("rawDataTable").innerHTML = `<tr><td>⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูลได้ในขณะนี้</td></tr>`;
+  }
+  btn.disabled = false; btn.textContent = orig;
+}
+
+function filteredRawRows(){
+  const q = document.getElementById("rawSearchBox").value.trim().toLowerCase();
+  if(!q) return CURRENT_RAW.rows;
+  return CURRENT_RAW.rows.filter(row =>
+    CURRENT_RAW.columns.some(c => String(row[c] ?? "").toLowerCase().includes(q))
+  );
+}
+
+function renderRawTable(columns, rows){
+  const el = document.getElementById("rawDataTable");
+  if(!columns.length){ el.innerHTML = ""; return; }
+  const filtered = filteredRawRows();
+  const head = `<tr>${columns.map(c=>`<th>${RAW_LABELS[c] || c}</th>`).join("")}</tr>`;
+  if(filtered.length === 0){
+    el.innerHTML = head + `<tr><td colspan="${columns.length}"><div class="empty-note">ไม่พบข้อมูล</div></td></tr>`;
+    return;
+  }
+  const body = filtered.map(row => `<tr>${columns.map(c=>{
+    let v = row[c];
+    if(c === "correct" || c === "is_first_attempt") v = v ? "✅" : "❌";
+    return `<td>${v ?? ""}</td>`;
+  }).join("")}</tr>`).join("");
+  el.innerHTML = head + body;
+}
+
+function toCsv(columns, rows){
+  const esc = (v) => {
+    const s = v === null || v === undefined ? "" : String(v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const head = columns.map(c => esc(RAW_LABELS[c] || c)).join(",");
+  const body = rows.map(r => columns.map(c => esc(r[c])).join(","));
+  return [head].concat(body).join("\r\n");
+}
+
+function downloadCsv(filename, csvText){
+  const blob = new Blob(["﻿" + csvText], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 </script>
 </body>
