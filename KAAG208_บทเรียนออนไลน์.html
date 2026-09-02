@@ -403,6 +403,7 @@ const MODULES = [
     video:"https://youtu.be/oUSvhEp5nbo",
     pdf:"https://drive.google.com/file/d/1JWB5sXpFiiBYSLMC5wIMehI6Em5v6t1U/view?usp=share_link",
     form:"https://forms.gle/7wYnFG1kVxeLhK3r5",
+    live:"./KAAG208_Cytogenetics_Live.html",
     prepost:[
       {q:"โครงสร้างส่วนใดของโครโมโซมทำหน้าที่ปกป้องปลายโครโมโซมไม่ให้เสื่อมสภาพ?",
         choices:["Centromere","Kinetochore","Telomere","Chromatid"],
@@ -992,6 +993,7 @@ function renderModule(mod){
       <div class="link-row">
         <a class="link-btn" href="${mod.video}" target="_blank" rel="noopener">▶ วิดีโอทบทวนก่อนเรียน</a>
         <a class="link-btn" href="${mod.pdf}" target="_blank" rel="noopener">📄 เอกสารประกอบการสอน (PDF)</a>
+        ${mod.live ? `<a class="link-btn" href="${mod.live}" target="_blank" rel="noopener">🖥️ หน้าสำหรับเรียนสด (Live Session)</a>` : ""}
       </div>
       ${banner}
     </div>
