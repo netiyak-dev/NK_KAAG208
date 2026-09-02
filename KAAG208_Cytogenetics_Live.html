@@ -203,11 +203,10 @@
   .poll-opts{ display:grid; gap:8px; }
   .poll-opt{ border:1px solid var(--rule); border-radius:8px; padding:9px 14px; font-size:14px; display:flex; gap:10px; align-items:center; }
   .poll-opt .letter{ font-family:"IBM Plex Mono",monospace; font-weight:600; color:var(--grey); }
-  .poll-opt.correct{ border-color:var(--moss); background:var(--moss-tint); }
-  .poll-opt.correct .letter{ color:var(--moss-dark); }
   .poll-answer{ margin-top:12px; font-size:13.5px; color:var(--ink-soft); display:none; }
   .poll-card.revealed .poll-answer{ display:block; }
-  .poll-card.revealed .poll-opt.correct{ font-weight:600; }
+  .poll-card.revealed .poll-opt.correct{ border-color:var(--moss); background:var(--moss-tint); font-weight:600; }
+  .poll-card.revealed .poll-opt.correct .letter{ color:var(--moss-dark); }
 
   /* ---------- Case study cards ---------- */
   .case-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin-top:16px; }
